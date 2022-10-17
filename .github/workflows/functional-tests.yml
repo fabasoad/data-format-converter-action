@@ -61,7 +61,7 @@ jobs:
           from: ${{ matrix.from }}
           to: ${{ matrix.to }}
       - name: Save result
-        run: echo '${{ steps.convert.outputs.data }}' > actual.${{ matrix.to }}
+        run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
       - name: Print actual file
         run: cat actual.${{ matrix.to }}
       - name: Validate
