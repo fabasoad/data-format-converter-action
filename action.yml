@@ -72,18 +72,19 @@ runs:
         wget $YQ_URL -O .
         mv ${{ steps.yq_info.outputs.YQ_BINARY }} ${{ steps.yq_info.outputs.YQ_EXEC }}
         chmod +x ${{ steps.yq_info.outputs.YQ_EXEC }}
-        echo "$(pwd)" >> $GITHUB_PATH
-        echo "::debug::${{ steps.yq_info.outputs.YQ_BINARY }}@${YQ_VERSION} has been installed"
       shell: bash
     - name: Install mikefarah/yq (Windows)
       if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && inputs.from != 'xml' && runner.os == 'Windows' }}
       env:
         YQ_URL: https://github.com/mikefarah/yq/releases/download/v4.28.1/${{ steps.yq_info.outputs.YQ_BINARY }}
-      run: |
-        Invoke-WebRequest -URI $Env:YQ_URL -OutFile ${{ steps.yq_info.outputs.YQ_EXEC }}
-        echo "$(pwd)" >> $GITHUB_PATH
-        echo "::debug::${{ steps.yq_info.outputs.YQ_BINARY }}@$Env:YQ_VERSION has been installed"
+      run: Invoke-WebRequest -URI $Env:YQ_URL -OutFile ${{ steps.yq_info.outputs.YQ_EXEC }}
       shell: pwsh
+    - name: Add mikefarah/yq to PATH
+      if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && inputs.from != 'xml' }}
+      run: |
+        echo "$(pwd)" >> $GITHUB_PATH
+        echo "::debug::${{ steps.yq_info.outputs.YQ_BINARY }}@v4.28.1 has been installed"
+      shell: bash
     # From YAML/JSON
     - name: YAML/JSON to all
       if: ${{ inputs.from != 'xml' }}
