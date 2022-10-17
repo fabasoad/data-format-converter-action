@@ -31,6 +31,7 @@ runs:
       run: |
         result=$(if command -v yq >/dev/null 2>&1; then echo true; else echo false; fi)
         echo "exists=$result" >> $GITHUB_OUTPUT
+        echo "::debug::yq exists = $result"
       shell: bash
     # Linux x86
     - name: Install mikefarah/yq (Linux X86)
@@ -42,6 +43,7 @@ runs:
         wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
         chmod +x yq
         echo "$(pwd)" >> $GITHUB_PATH
+        echo "::debug::${YQ_BINARY}@${YQ_VERSION} has been installed"
       shell: bash
     # Linux AMD64
     - name: Install mikefarah/yq (Linux AMD64)
@@ -53,6 +55,7 @@ runs:
         wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
         chmod +x yq
         echo "$(pwd)" >> $GITHUB_PATH
+        echo "::debug::${YQ_BINARY}@${YQ_VERSION} has been installed"
       shell: bash
     # Linux ARM
     - name: Install mikefarah/yq (Linux ARM)
@@ -64,6 +67,7 @@ runs:
         wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
         chmod +x yq
         echo "$(pwd)" >> $GITHUB_PATH
+        echo "::debug::${YQ_BINARY}@${YQ_VERSION} has been installed"
       shell: bash
     # Linux ARM64
     - name: Install mikefarah/yq (Linux ARM64)
@@ -75,6 +79,7 @@ runs:
         wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
         chmod +x yq
         echo "$(pwd)" >> $GITHUB_PATH
+        echo "::debug::${YQ_BINARY}@${YQ_VERSION} has been installed"
       shell: bash
     # macOS ARM64
     - name: Install mikefarah/yq (macOS ARM64)
@@ -86,6 +91,7 @@ runs:
         wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
         chmod +x yq
         echo "$(pwd)" >> $GITHUB_PATH
+        echo "::debug::${YQ_BINARY}@${YQ_VERSION} has been installed"
       shell: bash
     # macOS AMD64
     - name: Install mikefarah/yq (macOS AMD64)
@@ -97,6 +103,7 @@ runs:
         wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
         chmod +x yq
         echo "$(pwd)" >> $GITHUB_PATH
+        echo "::debug::${YQ_BINARY}@${YQ_VERSION} has been installed"
       shell: bash
     # Windows AMD64
     - name: Install mikefarah/yq (Windows AMD64)
@@ -108,6 +115,7 @@ runs:
         wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
         chmod +x yq
         echo "$(pwd)" >> $GITHUB_PATH
+        echo "::debug::${YQ_BINARY}@${YQ_VERSION} has been installed"
       shell: bash
     # Windows x86
     - name: Install mikefarah/yq (Windows X86)
@@ -119,9 +127,10 @@ runs:
         wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
         chmod +x yq
         echo "$(pwd)" >> $GITHUB_PATH
+        echo "::debug::${YQ_BINARY}@${YQ_VERSION} has been installed"
       shell: bash
     # From YAML/JSON
-    - name: JSON/YAML to JSON/XML/YAML
+    - name: JSON/YAML to all
       if: ${{ inputs.from != 'xml' }}
       run: yq -P '${{ inputs.path }}' -o=${{ inputs.to }} > .data-format-converter-action
       shell: bash
