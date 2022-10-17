@@ -26,8 +26,8 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: Check yq
-      id: check_yq
+    - name: Collect yq info
+      id: yq_info
       run: |
         result=$(if command -v yq >/dev/null 2>&1; then echo true; else echo false; fi)
         echo "YQ_INSTALLED=$result" >> $GITHUB_OUTPUT
@@ -57,26 +57,32 @@ runs:
           echo "::error file=action.yml,line=44,col=11,endColumn=11::${{ runner.os }} is not supported"
           exit 1
         fi
+        if [[ "${{ runner.os }}" == "Windows" ]]; then
+          echo "YQ_EXEC=yq.exe" >> $GITHUB_OUTPUT
+        else
+          echo "YQ_EXEC=yq" >> $GITHUB_OUTPUT
+        fi
         echo "YQ_BINARY=$YQ_BINARY" >> $GITHUB_OUTPUT
       shell: bash
     - name: Install mikefarah/yq
-      if: ${{ steps.check_yq.outputs.YQ_INSTALLED == false && inputs.from != 'xml' }}
+      if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && inputs.from != 'xml' }}
       env:
         YQ_VERSION: v4.28.1
       run: |
-        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${{ steps.check_yq.outputs.YQ_BINARY }} -O .
-        chmod +x yq
+        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${{ steps.yq_info.outputs.YQ_BINARY }} -O .
+        mv ${{ steps.yq_info.outputs.YQ_BINARY }} ${{ steps.yq_info.outputs.YQ_EXEC }}
+        chmod +x ${{ steps.yq_info.outputs.YQ_EXEC }}
         echo "$(pwd)" >> $GITHUB_PATH
         echo "::debug::${YQ_BINARY}@${YQ_VERSION} has been installed"
       shell: bash
     # From YAML/JSON
     - name: YAML/JSON to all
       if: ${{ inputs.from != 'xml' }}
-      run: yq -P '${{ inputs.input }}' -o=${{ inputs.to }} > .data-format-converter-action
+      run: ${{ steps.yq_info.outputs.YQ_EXEC }} -P '${{ inputs.input }}' -o=${{ inputs.to }} > .data-format-converter-action
       shell: bash
     - name: Uninstall mikefarah/yq
-      if: ${{ steps.check_yq.outputs.YQ_INSTALLED == false && inputs.from != 'xml' }}
-      run: rm -f yq
+      if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && inputs.from != 'xml' }}
+      run: rm -f ${{ steps.yq_info.outputs.YQ_EXEC }}
       shell: bash
     # From XML
     - name: Install kislyuk/yq
