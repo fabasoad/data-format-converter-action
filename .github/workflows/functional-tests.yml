@@ -1,5 +1,5 @@
 ---
-name: Functional Tests
+name: Functional tests
 
 on:
   push:
@@ -10,8 +10,8 @@ on:
       - 'main'
 
 jobs:
-  positive_tests:
-    name: Positive tests
+  functional_tests:
+    name: Functional tests
     timeout-minutes: 5
     strategy:
       fail-fast: false
@@ -19,13 +19,13 @@ jobs:
         os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
 #        from: ['yaml', 'json', 'xml']
 #        to: ['yaml', 'json', 'xml']
-        from: ['yaml']
+        from: ['yaml', 'json']
         to: ['json', 'xml']
-#        exclude:
+        exclude:
 #          - from: 'yaml'
 #            to: 'yaml'
-#          - from: 'json'
-#            to: 'json'
+          - from: 'json'
+            to: 'json'
 #          - from: 'xml'
 #            to: 'xml'
     runs-on: ${{ matrix.os }}
