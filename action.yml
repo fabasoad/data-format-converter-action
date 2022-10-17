@@ -104,13 +104,14 @@ runs:
       if: ${{ inputs.from == 'xml' }}
       run: pip install yq==3.1.0
       shell: bash
-    - name: XML to JSON
-      if: ${{ inputs.from == 'xml' && inputs.to == 'json' }}
-      run: xq . '${{ inputs.input }}' > .data-format-converter-action
-      shell: bash
-    - name: XML to YAML
-      if: ${{ inputs.from == 'xml' && inputs.to == 'yaml' }}
-      run: xq . '${{ inputs.input }}' | yq -y . > .data-format-converter-action
+    - name: XML to all
+      if: ${{ inputs.from == 'xml' }}
+      run: |
+        data=$(xq . '${{ inputs.input }}')
+        if [[ "${{ inputs.to }}" == "yaml" ]]; then
+          data=$(yq -y . $data)
+        fi
+        echo $data > .data-format-converter-action
       shell: bash
     - name: Uninstall kislyuk/yq
       if: ${{ inputs.from == 'xml' }}
