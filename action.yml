@@ -89,11 +89,11 @@ runs:
     - name: YAML/JSON to all
       if: ${{ inputs.from != 'xml' }}
       run: |
-        args='-P "${{ inputs.input }}" -o=${{ inputs.to }}'
-        if [[ "${{ inputs.to }}" != "yaml" ]]; then
-          args='$args -I=0'
+        if [[ "${{ inputs.to }}" == "yaml" ]]; then
+          ${{ steps.yq_info.outputs.YQ_EXEC }} -P '${{ inputs.input }}' -o=${{ inputs.to }} > .data-format-converter-action
+        else
+          ${{ steps.yq_info.outputs.YQ_EXEC }} -P '${{ inputs.input }}' -o=${{ inputs.to }} -I=0 > .data-format-converter-action
         fi
-        ${{ steps.yq_info.outputs.YQ_EXEC }} $args > .data-format-converter-action
       shell: bash
     - name: Uninstall mikefarah/yq
       if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && inputs.from != 'xml' }}

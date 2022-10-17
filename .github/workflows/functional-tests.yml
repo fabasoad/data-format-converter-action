@@ -51,10 +51,7 @@ jobs:
           from: ${{ matrix.from }}
           to: ${{ matrix.to }}
       - name: Save result
-        run: |
-          content='${{ steps.convert.outputs.output }}'
-          echo $content
-          echo $content > actual.${{ matrix.to }}
+        run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
         shell: bash
       - name: Print actual file
         run: cat actual.${{ matrix.to }}
