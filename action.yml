@@ -89,9 +89,9 @@ runs:
     - name: YAML/JSON to all
       if: ${{ inputs.from != 'xml' }}
       run: |
-        args="-P '${{ inputs.input }}' -o=${{ inputs.to }}"
+        args='-P "${{ inputs.input }}" -o=${{ inputs.to }}'
         if [[ "${{ inputs.to }}" != "yaml" ]]; then
-          args="$args -I=0"
+          args='$args -I=0'
         fi
         ${{ steps.yq_info.outputs.YQ_EXEC }} $args > .data-format-converter-action
       shell: bash
