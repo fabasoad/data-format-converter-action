@@ -1,0 +1,73 @@
+---
+name: Functional Tests
+
+on:
+  push:
+    branches:
+      - 'dependabot/**'
+      - 'feature-**'
+      - 'fix-**'
+      - 'main'
+
+jobs:
+  positive_tests:
+    name: Positive tests
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+        from: ['yaml', 'json', 'xml']
+        to: ['yaml', 'json', 'xml']
+        exclude:
+          - from: 'yaml'
+            to: 'yaml'
+          - from: 'json'
+            to: 'json'
+          - from: 'xml'
+            to: 'xml'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Prepare
+        run: |
+          echo "s:" > expected.yaml
+          echo "  v: '1'" >> expected.yaml
+          echo "  modules:" >> expected.yaml
+          echo "    - test1" >> expected.yaml
+          echo "    - test2" >> expected.yaml
+          echo '{' > expected.json
+          echo '  "s": {' >> expected.json
+          echo '    "v": 1,' >> expected.json
+          echo '    "modules": [' >> expected.json
+          echo '      "test1",' >> expected.json
+          echo '      "test2"' >> expected.json
+          echo '    ]' >> expected.json
+          echo '  }' >> expected.json
+          echo '}' >> expected.json
+          echo "<s>" > expected.xml
+          echo "  <v>1</v>" >> expected.xml
+          echo "  <modules>test1</modules>" >> expected.xml
+          echo "  <modules>test2</modules>" >> expected.xml
+          echo "</s>" >> expected.xml
+      - name: Convert
+        uses: ./
+        id: convert
+        with:
+          path: expected.${{ matrix.from }}
+          from: ${{ matrix.from }}
+          to: ${{ matrix.to }}
+      - name: Save result
+        run: echo '${{ steps.convert.outputs.data }}' > actual.${{ matrix.to }}
+      - name: Print actual file
+        run: cat actual.${{ matrix.to }}
+      - name: Validate
+        run: cmp -s "expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
+        shell: bash
+      - name: Clean
+        run: |
+          rm -f expected.yaml
+          rm -f expected.json
+          rm -f expected.xml
+          rm -f actual.${{ matrix.to }}
+        shell: bash

@@ -1,0 +1,155 @@
+---
+name: 'YAML/JSON/XML Converter Action'
+author: Yevhen Fabizhevskyi
+description: 'This action takes file that in YAML/JSON/XML format and produces it in output in YAML/JSON/XML format.'
+branding:
+  icon: copy
+  color: green
+inputs:
+  path:
+    description: 'Path to the file'
+    required: true
+  from:
+    description: 'Format of a file. Possible values: json, xml, yaml.'
+    required: true
+  to:
+    description: 'Format of a file as a result. Possible values: json, xml, yaml.'
+    required: true
+outputs:
+  data:
+    description: 'Content of a file in a format that is defined in format_to argument.'
+    value: ${{ steps.result.outputs.data }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Check yq
+      id: check_yq
+      run: |
+        result=$(if command -v yq >/dev/null 2>&1; then echo true; else echo false; fi)
+        echo "exists=$result" >> $GITHUB_OUTPUT
+      shell: bash
+    # Linux x86
+    - name: Install mikefarah/yq (Linux X86)
+      if: ${{ steps.check_yq.outputs.exists == false && inputs.from != 'xml' && runner.os == 'Linux' && runner.arch == 'X86' }}
+      env:
+        YQ_VERSION: v4.28.1
+        YQ_BINARY: yq_linux_386
+      run: |
+        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
+        chmod +x yq
+        echo "$(pwd)" >> $GITHUB_PATH
+      shell: bash
+    # Linux AMD64
+    - name: Install mikefarah/yq (Linux AMD64)
+      if: ${{ steps.check_yq.outputs.exists == false && inputs.from != 'xml' && runner.os == 'Linux' && runner.arch == 'X64' }}
+      env:
+        YQ_VERSION: v4.28.1
+        YQ_BINARY: yq_linux_amd64
+      run: |
+        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
+        chmod +x yq
+        echo "$(pwd)" >> $GITHUB_PATH
+      shell: bash
+    # Linux ARM
+    - name: Install mikefarah/yq (Linux ARM)
+      if: ${{ steps.check_yq.outputs.exists == false && inputs.from != 'xml' && runner.os == 'Linux' && runner.arch == 'ARM' }}
+      env:
+        YQ_VERSION: v4.28.1
+        YQ_BINARY: yq_linux_arm
+      run: |
+        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
+        chmod +x yq
+        echo "$(pwd)" >> $GITHUB_PATH
+      shell: bash
+    # Linux ARM64
+    - name: Install mikefarah/yq (Linux ARM64)
+      if: ${{ steps.check_yq.outputs.exists == false && inputs.from != 'xml' && runner.os == 'Linux' && runner.arch == 'ARM64' }}
+      env:
+        YQ_VERSION: v4.28.1
+        YQ_BINARY: yq_linux_arm64
+      run: |
+        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
+        chmod +x yq
+        echo "$(pwd)" >> $GITHUB_PATH
+      shell: bash
+    # macOS ARM64
+    - name: Install mikefarah/yq (macOS ARM64)
+      if: ${{ steps.check_yq.outputs.exists == false && inputs.from != 'xml' && runner.os == 'macOS' && runner.arch == 'ARM64' }}
+      env:
+        YQ_VERSION: v4.28.1
+        YQ_BINARY: yq_darwin_arm64
+      run: |
+        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
+        chmod +x yq
+        echo "$(pwd)" >> $GITHUB_PATH
+      shell: bash
+    # macOS AMD64
+    - name: Install mikefarah/yq (macOS AMD64)
+      if: ${{ steps.check_yq.outputs.exists == false && inputs.from != 'xml' && runner.os == 'macOS' && runner.arch == 'X64' }}
+      env:
+        YQ_VERSION: v4.28.1
+        YQ_BINARY: yq_darwin_amd64
+      run: |
+        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
+        chmod +x yq
+        echo "$(pwd)" >> $GITHUB_PATH
+      shell: bash
+    # Windows AMD64
+    - name: Install mikefarah/yq (Windows AMD64)
+      if: ${{ steps.check_yq.outputs.exists == false && inputs.from != 'xml' && runner.os == 'Windows' && runner.arch == 'X64' }}
+      env:
+        YQ_VERSION: v4.28.1
+        YQ_BINARY: yq_windows_amd64.exe
+      run: |
+        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
+        chmod +x yq
+        echo "$(pwd)" >> $GITHUB_PATH
+      shell: bash
+    # Windows x86
+    - name: Install mikefarah/yq (Windows X86)
+      if: ${{ steps.check_yq.outputs.exists == false && inputs.from != 'xml' && runner.os == 'Windows' && runner.arch == 'X86' }}
+      env:
+        YQ_VERSION: v4.28.1
+        YQ_BINARY: yq_windows_386.exe
+      run: |
+        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
+        chmod +x yq
+        echo "$(pwd)" >> $GITHUB_PATH
+      shell: bash
+    # From YAML/JSON
+    - name: JSON/YAML to JSON/XML/YAML
+      if: ${{ inputs.from != 'xml' }}
+      run: yq -P '${{ inputs.path }}' -o=${{ inputs.to }} > .yaml-json-xml-converter-action
+      shell: bash
+    - name: Uninstall mikefarah/yq
+      if: ${{ inputs.from != 'xml' }}
+      run: rm -f yq
+      shell: bash
+    # From XML
+    - name: Install kislyuk/yq
+      if: ${{ inputs.from == 'xml' }}
+      run: pip install yq==3.1.0
+      shell: bash
+    - name: XML to JSON
+      if: ${{ inputs.from == 'xml' && inputs.to == 'json' }}
+      run: xq . '${{ inputs.path }}' > .yaml-json-xml-converter-action
+      shell: bash
+    - name: XML to YAML
+      if: ${{ inputs.from == 'xml' && inputs.to == 'yaml' }}
+      run: xq . '${{ inputs.path }}' | yq -y . > .yaml-json-xml-converter-action
+      shell: bash
+    - name: Uninstall kislyuk/yq
+      if: ${{ inputs.from == 'xml' }}
+      run: pip uninstall -y yq
+      shell: bash
+    # Output
+    - name: Save output
+      id: result
+      run: |
+        content=$(cat .yaml-json-xml-converter-action)
+        content="${content//'%'/'%25'}"
+        content="${content//$'\n'/'%0A'}"
+        content="${content//$'\r'/'%0D'}"
+        echo "data=$content" >> $GITHUB_OUTPUT
+        rm -f .yaml-json-xml-converter-action
+      shell: bash
