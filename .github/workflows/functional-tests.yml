@@ -19,7 +19,8 @@ jobs:
 #        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
 #        from: ['yaml', 'json', 'xml']
 #        to: ['yaml', 'json', 'xml']
-        os: ['ubuntu-latest', 'windows-latest']
+        os: ['macos-latest']
+#        os: ['ubuntu-latest', 'windows-latest']
         from: ['yaml']
         to: ['json', 'xml']
 #        exclude:
