@@ -1,30 +1,31 @@
-# YAML/JSON/XML action
+# Data format converter action
 
-![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/fabasoad/yaml-json-xml-converter-action?include_prereleases) ![Unit Tests](https://github.com/fabasoad/yaml-json-xml-converter-action/workflows/Unit%20Tests/badge.svg) ![YAML Lint](https://github.com/fabasoad/yaml-json-xml-converter-action/workflows/YAML%20Lint/badge.svg) ![Security Tests](https://github.com/fabasoad/yaml-json-xml-converter-action/workflows/Security%20Tests/badge.svg) [![Total alerts](https://img.shields.io/lgtm/alerts/g/fabasoad/yaml-json-xml-converter-action.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/fabasoad/yaml-json-xml-converter-action/alerts/) [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/fabasoad/yaml-json-xml-converter-action.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/fabasoad/yaml-json-xml-converter-action/context:javascript) [![Known Vulnerabilities](https://snyk.io/test/github/fabasoad/yaml-json-xml-converter-action/badge.svg)](https://snyk.io/test/github/fabasoad/yaml-json-xml-converter-action) [![Maintainability](https://api.codeclimate.com/v1/badges/2e14282fa64af03f16b5/maintainability)](https://codeclimate.com/github/fabasoad/yaml-json-xml-converter-action/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/2e14282fa64af03f16b5/test_coverage)](https://codeclimate.com/github/fabasoad/yaml-json-xml-converter-action/test_coverage)
+![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/fabasoad/data-format-converter-action?include_prereleases)
 
-Converts YAML/JSON/XML file formats interchangeably.
+Converts YAML/JSON/XML/TOML file formats interchangeably.
 
 ## Inputs
 
-| Name | Required | Description                      | Possible values       |
-|------|----------|----------------------------------|-----------------------|
-| path | Yes      | Path to the file to be converted | _&lt;Path&gt;_        |
-| from | Yes      | Format of a file                 | `json`, `xml`, `yaml` |
-| to   | Yes      | Format of a file as a result     | `json`, `xml`, `yaml` |
+| Name        | Required | Description                               | Possible values               | Default |
+|-------------|----------|-------------------------------------------|-------------------------------|---------|
+| input       | Yes      | Path to the file to be converted          | _&lt;Path&gt;_ or data itself |         |
+| from        | Yes      | Format of a file                          | `json`, `xml`, `yaml`, `toml` |         |
+| to          | Yes      | Format of a file as a result              | `json`, `xml`, `yaml`, `toml` |         |
+| output-type | No       | Type of the result                        | `file`, `data`                | `data`  |
 
 ## Outputs
 
-| Name | Required | Description                                 |
-|------|----------|---------------------------------------------|
-| data | Yes      | Result in a format defined in `to` argument |
+| Name   | Required | Description                                                                                                                              |
+|--------|----------|------------------------------------------------------------------------------------------------------------------------------------------|
+| output | Yes      | Path to the file with the data in case of `output-type` is `path`, otherwise - data itself. Data is in a format defined in `to` argument |
 
 ## Example usage
 
 ### Prerequisites
 
-Let's imagine we need to transform _yaml_ file into _xml_ format and _json_ file into _yaml_ format.
+Let's imagine we need to transform _yaml_ file into _json_ data and _xml_ data into _yaml_ format.
 
-- `docker-compose.yml` file that will be transformed into _json_ file.
+- `docker-compose.yml` file that will be converted into _json_.
 
 ```yaml
 ---
@@ -44,14 +45,15 @@ networks:
     driver: bridge
 ```
 
-- `person.json` file that will be transformed into _yaml_ file.
+- JSON data that will be converted into _yaml_ file.
 
-```json
-{
-    "name": "John Doe",
-    "age": 32,
-    "hobbies": ["Music", "PC Games"]
-}
+```xml
+<person>
+    <name>John Doe</name>
+    <age>32</age>
+    <hobbies>Music</hobbies>
+    <hobbies>PC Games</hobbies>
+</person>
 ```
 
 ### Workflow configuration
@@ -66,27 +68,33 @@ jobs:
     name: Run converter
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: fabasoad/yaml-json-xml-converter-action@main
+      - uses: actions/checkout@main
+      - uses: fabasoad/data-format-converter-action@main
         id: yaml2xml
         with:
-          path: 'docker-compose.yml'
+          input: 'docker-compose.yml'
           from: 'yaml'
-          to: 'xml'
+          to: 'json'
+          output-type: 'data'
       - name: Print yaml2xml result
-        run: echo "${{ steps.yaml2xml.outputs.data }}"
-      - uses: fabasoad/yaml-json-xml-converter-action@main
-        id: json2yaml
+        run: echo "${{ steps.yaml2xml.outputs.output }}"
+      - uses: fabasoad/data-format-converter-action@main
+        id: xml2yaml
         with:
-          path: 'package.json'
-          from: 'json'
+          input: '<person><name>John Doe</name><age>32</age><hobbies>Music</hobbies><hobbies>PC Games</hobbies></person>'
+          from: 'xml'
           to: 'yaml'
+          output-type: 'file'
       - name: Print json2yaml result
-        run: echo "${{ steps.json2yaml.outputs.data }}"
+        run: |
+          echo "${{ steps.xml2yaml.outputs.output }}"
+          cat "${{ steps.xml2yaml.outputs.output }}"
 ```
 
 ### Result
 
-![Result](screenshot.png)
+```bash
+
+```
 
 > _Hint:_ If you define the same format for `from` and `to` parameters you can use this action to read the file :wink:

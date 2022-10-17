@@ -31,7 +31,7 @@ If applicable, add screenshots to help explain your problem.
 ## Technical information (please complete the following information)
 
 - OS: [e.g. Windows 10 Enterprise v.1909 (OS Build 18363.720)]
-- `yaml-json-xml-converter-action` version [e.g. 1.0.1]
+- `data-format-converter-action` version [e.g. 1.0.0]
 
 ## Additional context
 

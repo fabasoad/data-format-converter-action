@@ -16,16 +16,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        from: ['yaml', 'json', 'xml']
-        to: ['yaml', 'json', 'xml']
-        exclude:
-          - from: 'yaml'
-            to: 'yaml'
-          - from: 'json'
-            to: 'json'
-          - from: 'xml'
-            to: 'xml'
+#        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+#        from: ['yaml', 'json', 'xml']
+#        to: ['yaml', 'json', 'xml']
+        os: ['ubuntu-latest']
+        from: ['yaml']
+        to: ['json', 'xml']
+#        exclude:
+#          - from: 'yaml'
+#            to: 'yaml'
+#          - from: 'json'
+#            to: 'json'
+#          - from: 'xml'
+#            to: 'xml'
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -54,7 +57,7 @@ jobs:
         uses: ./
         id: convert
         with:
-          path: expected.${{ matrix.from }}
+          input: expected.${{ matrix.from }}
           from: ${{ matrix.from }}
           to: ${{ matrix.to }}
       - name: Save result

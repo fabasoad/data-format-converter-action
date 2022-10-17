@@ -119,7 +119,7 @@ runs:
     # From YAML/JSON
     - name: JSON/YAML to JSON/XML/YAML
       if: ${{ inputs.from != 'xml' }}
-      run: yq -P '${{ inputs.path }}' -o=${{ inputs.to }} > .yaml-json-xml-converter-action
+      run: yq -P '${{ inputs.path }}' -o=${{ inputs.to }} > .data-format-converter-action
       shell: bash
     - name: Uninstall mikefarah/yq
       if: ${{ inputs.from != 'xml' }}
@@ -132,11 +132,11 @@ runs:
       shell: bash
     - name: XML to JSON
       if: ${{ inputs.from == 'xml' && inputs.to == 'json' }}
-      run: xq . '${{ inputs.path }}' > .yaml-json-xml-converter-action
+      run: xq . '${{ inputs.path }}' > .data-format-converter-action
       shell: bash
     - name: XML to YAML
       if: ${{ inputs.from == 'xml' && inputs.to == 'yaml' }}
-      run: xq . '${{ inputs.path }}' | yq -y . > .yaml-json-xml-converter-action
+      run: xq . '${{ inputs.path }}' | yq -y . > .data-format-converter-action
       shell: bash
     - name: Uninstall kislyuk/yq
       if: ${{ inputs.from == 'xml' }}
@@ -146,10 +146,10 @@ runs:
     - name: Save output
       id: result
       run: |
-        content=$(cat .yaml-json-xml-converter-action)
+        content=$(cat .data-format-converter-action)
         content="${content//'%'/'%25'}"
         content="${content//$'\n'/'%0A'}"
         content="${content//$'\r'/'%0D'}"
         echo "data=$content" >> $GITHUB_OUTPUT
-        rm -f .yaml-json-xml-converter-action
+        rm -f .data-format-converter-action
       shell: bash
