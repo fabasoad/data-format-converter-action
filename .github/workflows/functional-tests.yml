@@ -37,7 +37,7 @@ jobs:
       - name: Prepare
         run: |
           echo "s:" > expected.yaml
-          echo "  v: '1'" >> expected.yaml
+          echo "  v: 1" >> expected.yaml
           echo "  modules:" >> expected.yaml
           echo "    - test1" >> expected.yaml
           echo "    - test2" >> expected.yaml
