@@ -54,6 +54,7 @@ jobs:
           echo "  <modules>test1</modules>" >> expected.xml
           echo "  <modules>test2</modules>" >> expected.xml
           echo "</s>" >> expected.xml
+        shell: bash
       - name: Convert
         uses: ./
         id: convert
@@ -63,12 +64,14 @@ jobs:
           to: ${{ matrix.to }}
       - name: Save result
         run: |
-          f = open("actual.${{ matrix.to }}", "w")
-          f.write('${{ steps.convert.outputs.output }}')
-          f.close()
+          with open("actual.${{ matrix.to }}", 'w') as f:
+            for line in '${{ steps.convert.outputs.output }}':
+              f.write(line)
+              f.write('\n')
         shell: python
       - name: Print actual file
         run: cat actual.${{ matrix.to }}
+        shell: bash
       - name: Validate
         run: cmp -s "expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
         shell: bash
