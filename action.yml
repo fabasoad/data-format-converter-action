@@ -132,7 +132,7 @@ runs:
     # From YAML/JSON
     - name: JSON/YAML to all
       if: ${{ inputs.from != 'xml' }}
-      run: yq -P '${{ inputs.path }}' -o=${{ inputs.to }} > .data-format-converter-action
+      run: yq -P '${{ inputs.input }}' -o=${{ inputs.to }} > .data-format-converter-action
       shell: bash
     - name: Uninstall mikefarah/yq
       if: ${{ inputs.from != 'xml' }}
@@ -145,11 +145,11 @@ runs:
       shell: bash
     - name: XML to JSON
       if: ${{ inputs.from == 'xml' && inputs.to == 'json' }}
-      run: xq . '${{ inputs.path }}' > .data-format-converter-action
+      run: xq . '${{ inputs.input }}' > .data-format-converter-action
       shell: bash
     - name: XML to YAML
       if: ${{ inputs.from == 'xml' && inputs.to == 'yaml' }}
-      run: xq . '${{ inputs.path }}' | yq -y . > .data-format-converter-action
+      run: xq . '${{ inputs.input }}' | yq -y . > .data-format-converter-action
       shell: bash
     - name: Uninstall kislyuk/yq
       if: ${{ inputs.from == 'xml' }}
