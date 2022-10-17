@@ -82,9 +82,9 @@ runs:
         YQ_VERSION: v4.28.1
         YQ_URL: https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${{ steps.yq_info.outputs.YQ_BINARY }}
       run: |
-        Invoke-WebRequest -URI $YQ_URL -OutFile $Path ${{ steps.yq_info.outputs.YQ_EXEC }}
+        Invoke-WebRequest -URI $Env:YQ_URL -OutFile ${{ steps.yq_info.outputs.YQ_EXEC }}
         $env:Path += ";$(pwd)"
-        echo "::debug::${{ steps.yq_info.outputs.YQ_BINARY }}@${YQ_VERSION} has been installed"
+        echo "::debug::${{ steps.yq_info.outputs.YQ_BINARY }}@$Env:YQ_VERSION has been installed"
       shell: pwsh
     # From YAML/JSON
     - name: YAML/JSON to all
