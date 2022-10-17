@@ -116,9 +116,11 @@ runs:
       id: result
       run: |
         content=$(cat .data-format-converter-action)
-        content="${content//'%'/'%25'}"
-        content="${content//$'\n'/'%0A'}"
-        content="${content//$'\r'/'%0D'}"
+        if [[ "${{ runner.os }}" != "macOS" ]]; then
+          content="${content//'%'/'%25'}"
+          content="${content//$'\n'/'%0A'}"
+          content="${content//$'\r'/'%0D'}"
+        fi
         echo "::set-output name=data::$content"
         rm -f .data-format-converter-action
       shell: bash
