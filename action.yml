@@ -136,7 +136,9 @@ runs:
       shell: bash
     - name: Uninstall mikefarah/yq
       if: ${{ inputs.from != 'xml' }}
-      run: rm -f yq
+      run: |
+        rm -f yq
+        echo "::debug::yq has been uninstalled"
       shell: bash
     # From XML
     - name: Install kislyuk/yq
@@ -163,8 +165,7 @@ runs:
         content="${content//'%'/'%25'}"
         content="${content//$'\n'/'%0A'}"
         content="${content//$'\r'/'%0D'}"
-        echo "CONTENT:"
-        echo "$content"
-        echo "data=$content" >> $GITHUB_OUTPUT
+        echo "::set-output name=data::$content"
         rm -f .data-format-converter-action
       shell: bash
+#        echo "data=$content" >> $GITHUB_OUTPUT
