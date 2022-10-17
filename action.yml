@@ -89,11 +89,11 @@ runs:
     - name: YAML/JSON to all
       if: ${{ inputs.from != 'xml' }}
       run: |
-        if [[ "${{ inputs.to }}" == "yaml" ]]; then
-          ${{ steps.yq_info.outputs.YQ_EXEC }} -P '${{ inputs.input }}' -o=${{ inputs.to }} > .data-format-converter-action
-        else
-          ${{ steps.yq_info.outputs.YQ_EXEC }} -P '${{ inputs.input }}' -o=${{ inputs.to }} -I=0 > .data-format-converter-action
+        params=('-P' '${{ inputs.input }}' '-o=${{ inputs.to }}')
+        if [[ "${{ inputs.to }}" != "yaml" ]]; then
+          params+=('-I=0')
         fi
+        ${{ steps.yq_info.outputs.YQ_EXEC }} "${params[@]}" > .data-format-converter-action
       shell: bash
     - name: Uninstall mikefarah/yq
       if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && inputs.from != 'xml' }}
@@ -127,4 +127,3 @@ runs:
         echo "::set-output name=data::$content"
         rm -f .data-format-converter-action
       shell: bash
-#        echo "data=$content" >> $GITHUB_OUTPUT
