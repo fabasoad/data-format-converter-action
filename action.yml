@@ -30,115 +30,53 @@ runs:
       id: check_yq
       run: |
         result=$(if command -v yq >/dev/null 2>&1; then echo true; else echo false; fi)
-        echo "exists=$result" >> $GITHUB_OUTPUT
-        echo "::debug::yq exists = $result"
+        echo "YQ_INSTALLED=$result" >> $GITHUB_OUTPUT
+        if [[ "${{ runner.os }}" == "macOS" ]]; then
+          if [[ "${{ runner.arch }}" == "ARM64" ]]; then
+            YQ_BINARY=yq_darwin_arm64
+          else
+            YQ_BINARY=yq_darwin_amd64
+          fi
+        elif [[ "${{ runner.os }}" == "Windows" ]]; then
+          if [[ "${{ runner.arch }}" == "X86" ]]; then
+            YQ_BINARY=yq_windows_386.exe
+          else
+            YQ_BINARY=yq_windows_amd64.exe
+          fi
+        elif [[ "${{ runner.os }}" == "Linux" ]]; then
+          if [[ "${{ runner.arch }}" == "X86" ]]; then
+            YQ_BINARY=yq_linux_386
+          elif [[ "${{ runner.arch }}" == "ARM" ]]; then
+            YQ_BINARY=yq_linux_arm
+          elif [[ "${{ runner.arch }}" == "ARM64" ]]; then
+            YQ_BINARY=yq_linux_arm64
+          else
+            YQ_BINARY=yq_linux_amd64
+          fi
+        else
+          echo "::error file=action.yml,line=44,col=11,endColumn=11::${{ runner.os }} is not supported"
+          exit 1
+        fi
+        echo "YQ_BINARY=$YQ_BINARY" >> $GITHUB_OUTPUT
       shell: bash
-    # Linux x86
-    - name: Install mikefarah/yq (Linux X86)
-      if: ${{ steps.check_yq.outputs.exists == false && inputs.from != 'xml' && runner.os == 'Linux' && runner.arch == 'X86' }}
+    - name: Install mikefarah/yq
+      if: ${{ steps.check_yq.outputs.YQ_INSTALLED == false && inputs.from != 'xml' }}
       env:
         YQ_VERSION: v4.28.1
-        YQ_BINARY: yq_linux_386
       run: |
-        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
-        chmod +x yq
-        echo "$(pwd)" >> $GITHUB_PATH
-        echo "::debug::${YQ_BINARY}@${YQ_VERSION} has been installed"
-      shell: bash
-    # Linux AMD64
-    - name: Install mikefarah/yq (Linux AMD64)
-      if: ${{ steps.check_yq.outputs.exists == false && inputs.from != 'xml' && runner.os == 'Linux' && runner.arch == 'X64' }}
-      env:
-        YQ_VERSION: v4.28.1
-        YQ_BINARY: yq_linux_amd64
-      run: |
-        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
-        chmod +x yq
-        echo "$(pwd)" >> $GITHUB_PATH
-        echo "::debug::${YQ_BINARY}@${YQ_VERSION} has been installed"
-      shell: bash
-    # Linux ARM
-    - name: Install mikefarah/yq (Linux ARM)
-      if: ${{ steps.check_yq.outputs.exists == false && inputs.from != 'xml' && runner.os == 'Linux' && runner.arch == 'ARM' }}
-      env:
-        YQ_VERSION: v4.28.1
-        YQ_BINARY: yq_linux_arm
-      run: |
-        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
-        chmod +x yq
-        echo "$(pwd)" >> $GITHUB_PATH
-        echo "::debug::${YQ_BINARY}@${YQ_VERSION} has been installed"
-      shell: bash
-    # Linux ARM64
-    - name: Install mikefarah/yq (Linux ARM64)
-      if: ${{ steps.check_yq.outputs.exists == false && inputs.from != 'xml' && runner.os == 'Linux' && runner.arch == 'ARM64' }}
-      env:
-        YQ_VERSION: v4.28.1
-        YQ_BINARY: yq_linux_arm64
-      run: |
-        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
-        chmod +x yq
-        echo "$(pwd)" >> $GITHUB_PATH
-        echo "::debug::${YQ_BINARY}@${YQ_VERSION} has been installed"
-      shell: bash
-    # macOS ARM64
-    - name: Install mikefarah/yq (macOS ARM64)
-      if: ${{ steps.check_yq.outputs.exists == false && inputs.from != 'xml' && runner.os == 'macOS' && runner.arch == 'ARM64' }}
-      env:
-        YQ_VERSION: v4.28.1
-        YQ_BINARY: yq_darwin_arm64
-      run: |
-        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
-        chmod +x yq
-        echo "$(pwd)" >> $GITHUB_PATH
-        echo "::debug::${YQ_BINARY}@${YQ_VERSION} has been installed"
-      shell: bash
-    # macOS AMD64
-    - name: Install mikefarah/yq (macOS AMD64)
-      if: ${{ steps.check_yq.outputs.exists == false && inputs.from != 'xml' && runner.os == 'macOS' && runner.arch == 'X64' }}
-      env:
-        YQ_VERSION: v4.28.1
-        YQ_BINARY: yq_darwin_amd64
-      run: |
-        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
-        chmod +x yq
-        echo "$(pwd)" >> $GITHUB_PATH
-        echo "::debug::${YQ_BINARY}@${YQ_VERSION} has been installed"
-      shell: bash
-    # Windows AMD64
-    - name: Install mikefarah/yq (Windows AMD64)
-      if: ${{ steps.check_yq.outputs.exists == false && inputs.from != 'xml' && runner.os == 'Windows' && runner.arch == 'X64' }}
-      env:
-        YQ_VERSION: v4.28.1
-        YQ_BINARY: yq_windows_amd64.exe
-      run: |
-        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
-        chmod +x yq
-        echo "$(pwd)" >> $GITHUB_PATH
-        echo "::debug::${YQ_BINARY}@${YQ_VERSION} has been installed"
-      shell: bash
-    # Windows x86
-    - name: Install mikefarah/yq (Windows X86)
-      if: ${{ steps.check_yq.outputs.exists == false && inputs.from != 'xml' && runner.os == 'Windows' && runner.arch == 'X86' }}
-      env:
-        YQ_VERSION: v4.28.1
-        YQ_BINARY: yq_windows_386.exe
-      run: |
-        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O .
+        wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${{ steps.check_yq.outputs.YQ_BINARY }} -O .
         chmod +x yq
         echo "$(pwd)" >> $GITHUB_PATH
         echo "::debug::${YQ_BINARY}@${YQ_VERSION} has been installed"
       shell: bash
     # From YAML/JSON
-    - name: JSON/YAML to all
+    - name: YAML/JSON to all
       if: ${{ inputs.from != 'xml' }}
       run: yq -P '${{ inputs.input }}' -o=${{ inputs.to }} > .data-format-converter-action
       shell: bash
     - name: Uninstall mikefarah/yq
-      if: ${{ inputs.from != 'xml' }}
-      run: |
-        rm -f yq
-        echo "::debug::yq has been uninstalled"
+      if: ${{ steps.check_yq.outputs.YQ_INSTALLED == false && inputs.from != 'xml' }}
+      run: rm -f yq
       shell: bash
     # From XML
     - name: Install kislyuk/yq

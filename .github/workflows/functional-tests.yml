@@ -30,8 +30,6 @@ jobs:
 #          - from: 'xml'
 #            to: 'xml'
     runs-on: ${{ matrix.os }}
-    env:
-      ACTIONS_RUNNER_DEBUG: true
     steps:
       - uses: actions/checkout@v3
       - name: Prepare
