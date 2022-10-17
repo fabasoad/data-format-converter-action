@@ -68,7 +68,7 @@ runs:
       if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && inputs.from != 'xml' && runner.os != 'Windows' }}
       env:
         YQ_VERSION: v4.28.1
-        YQ_URL: https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${{ steps.yq_info.outputs.YQ_BINARY }}
+        YQ_URL: https://github.com/mikefarah/yq/releases/download/${{ env.YQ_VERSION }}/${{ steps.yq_info.outputs.YQ_BINARY }}
       run: |
         wget $YQ_URL -O .
         mv ${{ steps.yq_info.outputs.YQ_BINARY }} ${{ steps.yq_info.outputs.YQ_EXEC }}
@@ -80,7 +80,7 @@ runs:
       if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && inputs.from != 'xml' && runner.os == 'Windows' }}
       env:
         YQ_VERSION: v4.28.1
-        YQ_URL: https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${{ steps.yq_info.outputs.YQ_BINARY }}
+        YQ_URL: https://github.com/mikefarah/yq/releases/download/${{ env.YQ_VERSION }}/${{ steps.yq_info.outputs.YQ_BINARY }}
       run: |
         echo "Downloading $Env:YQ_URL..."
         Invoke-WebRequest -URI $Env:YQ_URL -OutFile ${{ steps.yq_info.outputs.YQ_EXEC }}
