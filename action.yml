@@ -126,12 +126,5 @@ runs:
         script: |
           const fs = require('fs');
           const file = '.data-format-converter-action';
-          try {
-            core.setOutput('data', fs.readFileSync(file, 'utf8'));
-          } catch (e) {
-            core.setFailed(e.message);
-          }
-          try {
-            fs.unlinkSync(file);
-          } catch (ignored) {
-          }
+          core.setOutput('data', fs.readFileSync(file, 'utf8'));
+          fs.unlinkSync(file);
