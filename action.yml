@@ -122,5 +122,5 @@ runs:
       with:
         script: |
           const fs = require('fs');
-          core.setOutput('data', fs.readFileSync('${{ steps.yq_info.outputs.YQ_TEMP_FILE }}', 'utf-8')/*.replace(/\s+$/gm, '')*/);
+          core.setOutput('data', fs.readFileSync('${{ steps.yq_info.outputs.YQ_TEMP_FILE }}', 'utf-8').replace(/\s+$/gm, ''));
           fs.unlinkSync('${{ steps.yq_info.outputs.YQ_TEMP_FILE }}');
