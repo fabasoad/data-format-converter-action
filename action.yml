@@ -68,7 +68,7 @@ runs:
         echo "YQ_BINARY=$YQ_BINARY" >> $GITHUB_OUTPUT
       shell: bash
     - name: Install mikefarah/yq (Linux / macOS)
-      if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && inputs.from != 'xml' && runner.os != 'Windows' }}
+      if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && runner.os != 'Windows' }}
       env:
         YQ_URL: https://github.com/mikefarah/yq/releases/download/${{ steps.yq_info.outputs.YQ_VERSION }}/${{ steps.yq_info.outputs.YQ_BINARY }}
       run: |
@@ -77,49 +77,48 @@ runs:
         chmod +x ${{ steps.yq_info.outputs.YQ_EXEC }}
       shell: bash
     - name: Install mikefarah/yq (Windows)
-      if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && inputs.from != 'xml' && runner.os == 'Windows' }}
+      if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && runner.os == 'Windows' }}
       env:
         YQ_URL: https://github.com/mikefarah/yq/releases/download/${{ steps.yq_info.outputs.YQ_VERSION }}/${{ steps.yq_info.outputs.YQ_BINARY }}
       run: Invoke-WebRequest -URI $Env:YQ_URL -OutFile ${{ steps.yq_info.outputs.YQ_EXEC }}
       shell: pwsh
     - name: Add mikefarah/yq to PATH
-      if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && inputs.from != 'xml' }}
+      if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' }}
       run: |
         echo "$(pwd)" >> $GITHUB_PATH
         echo "::debug::${{ steps.yq_info.outputs.YQ_BINARY }}@${{ steps.yq_info.outputs.YQ_VERSION }} has been installed"
       shell: bash
-    # From YAML/JSON
-    - name: YAML/JSON to all
+    - name: Convert
       if: ${{ inputs.from != 'xml' }}
       run: |
-        params=('-P' '${{ inputs.input }}' '-o=${{ inputs.to }}')
+        params=('-P' '${{ inputs.input }}' '-p=${{ inputs.from }}' '-o=${{ inputs.to }}')
         if [[ "${{ inputs.to }}" != "yaml" ]]; then
           params+=('-I=0')
         fi
         ${{ steps.yq_info.outputs.YQ_EXEC }} "${params[@]}" > .data-format-converter-action
       shell: bash
     - name: Uninstall mikefarah/yq
-      if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && inputs.from != 'xml' }}
+      if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' }}
       run: rm -f ${{ steps.yq_info.outputs.YQ_EXEC }}
       shell: bash
     # From XML
-    - name: Install kislyuk/yq
-      if: ${{ inputs.from == 'xml' }}
-      run: pip install yq==3.1.0
-      shell: bash
-    - name: XML to all
-      if: ${{ inputs.from == 'xml' }}
-      run: |
-        data=$(xq . '${{ inputs.input }}' -c)
-        if [[ "${{ inputs.to }}" == "yaml" ]]; then
-          data=$(echo $data | yq -y .)
-        fi
-        echo $data > .data-format-converter-action
-      shell: bash
-    - name: Uninstall kislyuk/yq
-      if: ${{ inputs.from == 'xml' }}
-      run: pip uninstall -y yq
-      shell: bash
+#    - name: Install kislyuk/yq
+#      if: ${{ inputs.from == 'xml' }}
+#      run: pip install yq==3.1.0
+#      shell: bash
+#    - name: XML to all
+#      if: ${{ inputs.from == 'xml' }}
+#      run: |
+#        data=$(xq . '${{ inputs.input }}' -c)
+#        if [[ "${{ inputs.to }}" == "yaml" ]]; then
+#          data=$(echo $data | yq -y .)
+#        fi
+#        echo $data > .data-format-converter-action
+#      shell: bash
+#    - name: Uninstall kislyuk/yq
+#      if: ${{ inputs.from == 'xml' }}
+#      run: pip uninstall -y yq
+#      shell: bash
     # Output
     - name: Save output
       id: result
