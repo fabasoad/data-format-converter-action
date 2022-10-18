@@ -89,7 +89,6 @@ runs:
         echo "::debug::${{ steps.yq_info.outputs.YQ_BINARY }}@${{ steps.yq_info.outputs.YQ_VERSION }} has been installed"
       shell: bash
     - name: Convert
-      if: ${{ inputs.from != 'xml' }}
       run: |
         params=('-P' '${{ inputs.input }}' '-p=${{ inputs.from }}' '-o=${{ inputs.to }}')
         if [[ "${{ inputs.to }}" != "yaml" ]]; then
