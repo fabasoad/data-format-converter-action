@@ -123,11 +123,9 @@ runs:
     # Output
     - name: Save output
       id: result
-      run: |
-        content=$(cat .data-format-converter-action)
-        content="${content//'%'/'%25'}"
-        content="${content//$'\n'/'%0A'}"
-        content="${content//$'\r'/'%0D'}"
-        echo "::set-output name=data::$content"
-        rm -f .data-format-converter-action
-      shell: bash
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const file = '.data-format-converter-action';
+          core.setOutput('data', fs.readFileSync(file, 'utf8'));
+          fs.unlinkSync(file);

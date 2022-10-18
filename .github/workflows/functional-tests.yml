@@ -16,16 +16,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+#        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
 #        from: ['yaml', 'json', 'xml']
-#        os: ['ubuntu-latest']
-        from: ['yaml', 'json']
-        to: ['yaml', 'json', 'xml']
-        exclude:
-          - from: 'yaml'
-            to: 'yaml'
-          - from: 'json'
-            to: 'json'
+        os: ['ubuntu-latest']
+        from: ['xml']
+        to: ['yaml', 'json']
+#        exclude:
+#          - from: 'yaml'
+#            to: 'yaml'
+#          - from: 'json'
+#            to: 'json'
 #          - from: 'xml'
 #            to: 'xml'
     runs-on: ${{ matrix.os }}
