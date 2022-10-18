@@ -33,13 +33,13 @@ jobs:
       - uses: actions/checkout@v3
       - name: Prepare
         run: |
-          echo "s:" > expected.yaml
-          echo "  v: 1" >> expected.yaml
-          echo "  m:" >> expected.yaml
-          echo "    - t1" >> expected.yaml
-          echo "    - t2" >> expected.yaml
-          echo '{"s":{"v":1,"m":["t1","t2"]}}' > expected.json
-          echo "<s><v>1</v><m>t1</m><m>t2</m></s>" > expected.xml
+          echo 's:' > expected.yaml
+          echo '  v: "1"' >> expected.yaml
+          echo '  m:' >> expected.yaml
+          echo '    - t1' >> expected.yaml
+          echo '    - t2' >> expected.yaml
+          echo '{"s":{"v":"1","m":["t1","t2"]}}' > expected.json
+          echo '<s><v>1</v><m>t1</m><m>t2</m></s>' > expected.xml
         shell: bash
       - name: Convert
         uses: ./
