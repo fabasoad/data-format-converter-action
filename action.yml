@@ -110,7 +110,7 @@ runs:
     - name: XML to all
       if: ${{ inputs.from == 'xml' }}
       run: |
-        data=$(xq . '${{ inputs.input }}')
+        data=$(xq . '${{ inputs.input }}' -c)
         if [[ "${{ inputs.to }}" == "yaml" ]]; then
           data=$(echo $data | yq -y .)
         fi
