@@ -30,8 +30,10 @@ runs:
       id: yq_info
       env:
         YQ_VERSION: v4.28.1
+        YQ_TEMP_FILE: .data-format-converter-action
       run: |
         echo "YQ_VERSION=$YQ_VERSION" >> $GITHUB_OUTPUT
+        echo "YQ_TEMP_FILE=$YQ_TEMP_FILE" >> $GITHUB_OUTPUT
         result=$(if command -v yq >/dev/null 2>&1; then echo true; else echo false; fi)
         echo "YQ_INSTALLED=$result" >> $GITHUB_OUTPUT
         if [[ "${{ runner.os }}" == "macOS" ]]; then
@@ -94,7 +96,7 @@ runs:
         if [[ "${{ inputs.to }}" != "yaml" ]]; then
           params+=('-I=0')
         fi
-        ${{ steps.yq_info.outputs.YQ_EXEC }} "${params[@]}" > .data-format-converter-action
+        ${{ steps.yq_info.outputs.YQ_EXEC }} "${params[@]}" > "${{ steps.yq_info.outputs.YQ_TEMP_FILE }}"
       shell: bash
     - name: Uninstall mikefarah/yq
       if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' }}
@@ -112,7 +114,7 @@ runs:
 #        if [[ "${{ inputs.to }}" == "yaml" ]]; then
 #          data=$(echo $data | yq -y .)
 #        fi
-#        echo $data > .data-format-converter-action
+#        echo $data > "${{ steps.yq_info.outputs.YQ_TEMP_FILE }}"
 #      shell: bash
 #    - name: Uninstall kislyuk/yq
 #      if: ${{ inputs.from == 'xml' }}
@@ -121,10 +123,11 @@ runs:
     # Output
     - name: Save output
       id: result
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const fs = require('fs');
-          const file = '.data-format-converter-action';
-          core.setOutput('data', fs.readFileSync(file, 'utf8'));
-          fs.unlinkSync(file);
+      run: |
+        content=$(cat "${{ steps.yq_info.outputs.YQ_TEMP_FILE }}")
+        content="${content//'%'/'%25'}"
+        content="${content//$'\n'/'%0A'}"
+        content="${content//$'\r'/'%0D'}"
+        echo "::set-output name=data::$content"
+        rm -f "${{ steps.yq_info.outputs.YQ_TEMP_FILE }}"
+      shell: bash
