@@ -16,21 +16,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-latest']
-#        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        from: ['yaml']
-#        from: ['yaml', 'json', 'xml', 'props']
-        to: ['props']
-#        to: ['yaml', 'json', 'xml', 'props']
-#        exclude:
-#          - from: 'yaml'
-#            to: 'yaml'
-#          - from: 'json'
-#            to: 'json'
-#          - from: 'xml'
-#            to: 'xml'
-#          - from: 'props'
-#            to: 'props'
+        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+        from: ['yaml', 'json', 'xml', 'props']
+        to: ['yaml', 'json', 'xml', 'props']
+        exclude:
+          - from: 'yaml'
+            to: 'yaml'
+          - from: 'json'
+            to: 'json'
+          - from: 'xml'
+            to: 'xml'
+          - from: 'props'
+            to: 'props'
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
