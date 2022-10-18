@@ -50,12 +50,14 @@ jobs:
           echo '    ]' >> expected.json
           echo '  }' >> expected.json
           echo '}' >> expected.json
-          echo "<s>" > expected.xml
-          echo "  <v>1</v>" >> expected.xml
-          echo "  <m>t1</m>" >> expected.xml
-          echo "  <m>t2</m>" >> expected.xml
-          echo "</s>" >> expected.xml
-          touch expected.props
+          echo '<s>' > expected.xml
+          echo '  <v>1</v>' >> expected.xml
+          echo '  <m>t1</m>' >> expected.xml
+          echo '  <m>t2</m>' >> expected.xml
+          echo '</s>' >> expected.xml
+          echo 's.v = 1' > expected.props
+          echo 's.m.0 = t1' >> expected.props
+          echo 's.m.1 = t2' >> expected.props
         shell: bash
       - name: Convert
         uses: ./
