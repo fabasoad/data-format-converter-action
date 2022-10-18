@@ -118,23 +118,10 @@ runs:
     # Output
     - name: Save output
       id: result
-      run: |
-        content=$(cat "${{ steps.yq_info.outputs.YQ_TEMP_FILE }}")
-        content="${content//'%'/'%25'}"
-        content="${content//$'\n'/'%0A'}"
-        content="${content//$'\r'/'%0D'}"
-        echo "::set-output name=data::$content"
-        rm -f "${{ steps.yq_info.outputs.YQ_TEMP_FILE }}"
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          core.setOutput('data', fs.readFileSync('${{ steps.yq_info.outputs.YQ_TEMP_FILE }}', 'utf-8').replace(/\s+$/gm, ''));
+          fs.unlinkSync('${{ steps.yq_info.outputs.YQ_TEMP_FILE }}');
       shell: bash
-    - name: Debug (bash)
-      run: |
-        echo "${{ steps.result.outputs.data }}"
-      shell: bash
-    - name: Debug (powershell)
-      run: |
-        Write-Host –NoNewLine "${{ steps.result.outputs.data }}"
-      shell: powershell
-    - name: Debug (powershell)
-      run: |
-        print('${{ steps.result.outputs.data }}')
-      shell: python
