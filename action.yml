@@ -62,12 +62,12 @@ runs:
           echo "::error file=action.yml,line=44,col=11,endColumn=11::${{ runner.os }} is not supported"
           exit 1
         fi
+        echo "YQ_BINARY=$YQ_BINARY" >> $GITHUB_OUTPUT
         if [[ "${{ runner.os }}" == "Windows" ]]; then
           echo "YQ_EXEC=yq.exe" >> $GITHUB_OUTPUT
         else
           echo "YQ_EXEC=yq" >> $GITHUB_OUTPUT
         fi
-        echo "YQ_BINARY=$YQ_BINARY" >> $GITHUB_OUTPUT
       shell: bash
     - name: Install mikefarah/yq (Linux / macOS)
       if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && runner.os != 'Windows' }}
@@ -97,24 +97,6 @@ runs:
       if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' }}
       run: rm -f ${{ steps.yq_info.outputs.YQ_EXEC }}
       shell: bash
-    # From XML
-#    - name: Install kislyuk/yq
-#      if: ${{ inputs.from == 'xml' }}
-#      run: pip install yq==3.1.0
-#      shell: bash
-#    - name: XML to all
-#      if: ${{ inputs.from == 'xml' }}
-#      run: |
-#        data=$(xq . '${{ inputs.input }}' -c)
-#        if [[ "${{ inputs.to }}" == "yaml" ]]; then
-#          data=$(echo $data | yq -y .)
-#        fi
-#        echo $data > "${{ steps.yq_info.outputs.YQ_TEMP_FILE }}"
-#      shell: bash
-#    - name: Uninstall kislyuk/yq
-#      if: ${{ inputs.from == 'xml' }}
-#      run: pip uninstall -y yq
-#      shell: bash
     # Output
     - name: Save output
       id: result
