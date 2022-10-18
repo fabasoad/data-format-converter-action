@@ -22,7 +22,7 @@ inputs:
 outputs:
   output:
     description: 'File with the converted data in case of output-type is "file", otherwise - converted data itself.'
-    value: ${{ steps.result.outputs.data }}
+    value: ${{ join(steps.result.outputs.data, '') }}
 runs:
   using: 'composite'
   steps:
