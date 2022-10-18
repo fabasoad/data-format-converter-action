@@ -16,16 +16,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        from: ['yaml', 'json', 'xml']
-        to: ['yaml', 'json', 'xml']
-        exclude:
-          - from: 'yaml'
-            to: 'yaml'
-          - from: 'json'
-            to: 'json'
-          - from: 'xml'
-            to: 'xml'
+        os: ['ubuntu-latest']
+#        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+        from: ['yaml']
+#        from: ['yaml', 'json', 'xml', 'props']
+        to: ['props']
+#        to: ['yaml', 'json', 'xml', 'props']
+#        exclude:
+#          - from: 'yaml'
+#            to: 'yaml'
+#          - from: 'json'
+#            to: 'json'
+#          - from: 'xml'
+#            to: 'xml'
+#          - from: 'props'
+#            to: 'props'
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -50,6 +55,7 @@ jobs:
           echo "  <m>t1</m>" >> expected.xml
           echo "  <m>t2</m>" >> expected.xml
           echo "</s>" >> expected.xml
+          touch expected.props
         shell: bash
       - name: Convert
         uses: ./
@@ -72,5 +78,6 @@ jobs:
           rm -f expected.yaml
           rm -f expected.json
           rm -f expected.xml
+          rm -f expected.props
           rm -f actual.${{ matrix.to }}
         shell: bash
