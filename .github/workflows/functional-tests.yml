@@ -37,8 +37,20 @@ jobs:
           echo '  m:' >> expected.yaml
           echo '    - t1' >> expected.yaml
           echo '    - t2' >> expected.yaml
-          echo '{"s":{"v":"1","m":["t1","t2"]}}' > expected.json
-          echo '<s><v>1</v><m>t1</m><m>t2</m></s>' > expected.xml
+          echo '{' > expected.json
+          echo '  "s": {' >> expected.json
+          echo '    "v": "1",' >> expected.json
+          echo '    "m": [' >> expected.json
+          echo '      "t1",' >> expected.json
+          echo '      "t2"' >> expected.json
+          echo '    ]' >> expected.json
+          echo '  }' >> expected.json
+          echo '}' >> expected.json
+          echo "<s>" > expected.xml
+          echo "  <v>1</v>" >> expected.xml
+          echo "  <m>t1</m>" >> expected.xml
+          echo "  <m>t2</m>" >> expected.xml
+          echo "</s>" >> expected.xml
         shell: bash
       - name: Convert
         uses: ./
