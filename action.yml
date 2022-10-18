@@ -126,6 +126,7 @@ runs:
       uses: actions/github-script@v6
       with:
         script: |
+          const fs = require('fs');
           const file = '.data-format-converter-action';
           core.setOutput('data', fs.readFileSync(file, 'utf8'));
           fs.unlinkSync(file);
