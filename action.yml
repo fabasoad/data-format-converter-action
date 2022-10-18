@@ -22,7 +22,7 @@ inputs:
 outputs:
   output:
     description: 'File with the converted data in case of output-type is "file", otherwise - converted data itself.'
-    value: ${{ join(steps.result.outputs.data, '') }}
+    value: ${{ steps.result.outputs.data }}
 runs:
   using: 'composite'
   steps:
@@ -131,3 +131,15 @@ runs:
         echo "::set-output name=data::$content"
         rm -f "${{ steps.yq_info.outputs.YQ_TEMP_FILE }}"
       shell: bash
+    - name: Debug (bash)
+      run: |
+        echo "${{ steps.result.outputs.data }}"
+      shell: bash
+    - name: Debug (powershell)
+      run: |
+        Write-Host –NoNewLine "${{ steps.result.outputs.data }}"
+      shell: powershell
+    - name: Debug (powershell)
+      run: |
+        print('${{ steps.result.outputs.data }}')
+      shell: python
