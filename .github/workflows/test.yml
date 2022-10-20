@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@main
       - name: Prepare
         run: |
-          echo 'version: "3.7"' > docker-compose.yml
+          echo "version: 3.7" > docker-compose.yml
           echo "services:" >> docker-compose.yml
           echo "  mongo:" >> docker-compose.yml
           echo "    image: mongo:4.2.3-bionic" >> docker-compose.yml
@@ -25,7 +25,7 @@ jobs:
           echo "networks:" >> docker-compose.yml
           echo "  test-network:" >> docker-compose.yml
           echo "    name: test-network" >> docker-compose.yml
-          echo "    driver: bridge"" >> docker-compose.yml
+          echo "    driver: bridge" >> docker-compose.yml
           echo "<person>" > person.xml
           echo "    <name>John Doe</name>" >> person.xml
           echo "    <age>32</age>" >> person.xml
