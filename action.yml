@@ -7,21 +7,17 @@ branding:
   color: green
 inputs:
   input:
-    description: 'Path to the file with the data or data itself'
+    description: 'Path to the file with the data to be converted.'
     required: true
   from:
-    description: 'Format of a file. Possible values: json, xml, yaml, toml.'
+    description: 'Format of a file. Possible values: json, xml, yaml, props.'
     required: true
   to:
-    description: 'Format of a file as a result. Possible values: json, xml, yaml, toml.'
+    description: 'Format of a file as a result. Possible values: json, xml, yaml, props.'
     required: true
-  output-type:
-    description: 'Either path to the file with the converted data or converted data itself. Possible values: file, data.'
-    required: false
-    default: 'data'
 outputs:
   output:
-    description: 'File with the converted data in case of output-type is "file", otherwise - converted data itself.'
+    description: 'Converted data.'
     value: ${{ steps.result.outputs.data }}
 runs:
   using: 'composite'

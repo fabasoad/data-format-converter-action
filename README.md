@@ -19,16 +19,16 @@ Converts YAML/JSON/XML/TOML file formats interchangeably.
 |--------|----------|------------------------------------------------------------------------------------------------------------------------------------------|
 | output | Yes      | Path to the file with the data in case of `output-type` is `path`, otherwise - data itself. Data is in a format defined in `to` argument |
 
-## Example usage
+## Examples
 
-### Prerequisites
+### 1. YAML to JSON
 
-Let's imagine we need to transform _yaml_ file into _json_ data and _xml_ data into _yaml_ format.
+#### 1.1. Initial data
 
-- `docker-compose.yml` file that will be converted into _json_.
+`docker-compose.yml` is a file to be converted into `JSON` with the following
+content:
 
 ```yaml
----
 version: '3.7'
 services:
   mongo:
@@ -45,18 +45,7 @@ networks:
     driver: bridge
 ```
 
-- JSON data that will be converted into _yaml_ file.
-
-```xml
-<person>
-    <name>John Doe</name>
-    <age>32</age>
-    <hobbies>Music</hobbies>
-    <hobbies>PC Games</hobbies>
-</person>
-```
-
-### Workflow configuration
+#### 1.2. Workflow configuration
 
 ```yaml
 name: Convert
@@ -70,28 +59,61 @@ jobs:
     steps:
       - uses: actions/checkout@main
       - uses: fabasoad/data-format-converter-action@main
-        id: yaml2xml
+        id: yaml2json
         with:
           input: 'docker-compose.yml'
           from: 'yaml'
           to: 'json'
-          output-type: 'data'
-      - name: Print yaml2xml result
-        run: echo "${{ steps.yaml2xml.outputs.output }}"
+      - name: Print result
+        run: echo "${{ steps.yaml2json.outputs.output }}"
+```
+
+#### 1.3. Result
+
+```bash
+
+```
+
+### 2. XML to YAML
+
+#### 2.1. Initial data
+
+`person.xml` is a file to be converted into `YAML` with the following
+content:
+
+```xml
+<person>
+    <name>John Doe</name>
+    <age>32</age>
+    <hobbies>Music</hobbies>
+    <hobbies>PC Games</hobbies>
+</person>
+```
+
+#### 2.2. Workflow configuration
+
+```yaml
+name: Convert
+
+on: push
+
+jobs:
+  converter:
+    name: Run converter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
       - uses: fabasoad/data-format-converter-action@main
         id: xml2yaml
         with:
-          input: '<person><name>John Doe</name><age>32</age><hobbies>Music</hobbies><hobbies>PC Games</hobbies></person>'
+          input: 'person.xml'
           from: 'xml'
           to: 'yaml'
-          output-type: 'file'
-      - name: Print json2yaml result
-        run: |
-          echo "${{ steps.xml2yaml.outputs.output }}"
-          cat "${{ steps.xml2yaml.outputs.output }}"
+      - name: Print result
+        run: echo "${{ steps.xml2yaml.outputs.output }}"
 ```
 
-### Result
+#### 2.3. Result
 
 ```bash
 

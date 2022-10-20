@@ -1,0 +1,51 @@
+name: Convert
+
+on:
+  push:
+    branches:
+      - 'feature-functional-tests'
+
+jobs:
+  converter:
+    name: Run converter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Prepare
+        run: |
+          echo "version: '3.7'" > docker-compose.yml
+          echo "services:" >> docker-compose.yml
+          echo "  mongo:" >> docker-compose.yml
+          echo "    image: mongo:4.2.3-bionic" >> docker-compose.yml
+          echo "    environment:" >> docker-compose.yml
+          echo "      MONGO_INITDB_ROOT_USERNAME: root" >> docker-compose.yml
+          echo "      p: abc123" >> docker-compose.yml
+          echo "    networks:" >> docker-compose.yml
+          echo "      - test-network" >> docker-compose.yml
+          echo "networks:" >> docker-compose.yml
+          echo "  test-network:" >> docker-compose.yml
+          echo "    name: test-network" >> docker-compose.yml
+          echo "    driver: bridge"" >> docker-compose.yml
+          echo "<person>" > person.xml
+          echo "    <name>John Doe</name>" >> person.xml
+          echo "    <age>32</age>" >> person.xml
+          echo "    <hobbies>Music</hobbies>" >> person.xml
+          echo "    <hobbies>PC Games</hobbies>" >> person.xml
+          echo "</person>" >> person.xml
+        shell: bash
+      - uses: ./
+        id: yaml2json
+        with:
+          input: 'docker-compose.yml'
+          from: 'yaml'
+          to: 'json'
+      - name: Print result
+        run: echo "${{ steps.yaml2json.outputs.output }}"
+      - uses: ./
+        id: xml2yaml
+        with:
+          input: 'person.xml'
+          from: 'xml'
+          to: 'yaml'
+      - name: Print result
+        run: echo "${{ steps.xml2yaml.outputs.output }}"
