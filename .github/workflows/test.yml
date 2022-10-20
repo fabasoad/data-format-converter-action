@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@main
       - name: Prepare
         run: |
-          echo "version: '3.7'" > docker-compose.yml
+          echo 'version: "3.7"' > docker-compose.yml
           echo "services:" >> docker-compose.yml
           echo "  mongo:" >> docker-compose.yml
           echo "    image: mongo:4.2.3-bionic" >> docker-compose.yml
