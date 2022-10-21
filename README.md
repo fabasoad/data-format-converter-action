@@ -1,17 +1,20 @@
 # Data format converter action
 
-![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/fabasoad/data-format-converter-action?include_prereleases) ![Functional Tests](https://github.com/fabasoad/data-format-converter-action/workflows/Functional%20tests/badge.svg)
+![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/fabasoad/data-format-converter-action?include_prereleases)
+![Functional Tests](https://github.com/fabasoad/data-format-converter-action/workflows/Functional%20tests/badge.svg)
 
 Converts data formats interchangeably. The following formats are supported: [XML](https://www.w3schools.com/xml/),
 [YAML](https://yaml.org/), [JSON](https://www.json.org/json-en.html), [PROPS](https://www.ibm.com/docs/en/was/8.5.5?topic=SSEQTP_8.5.5/com.ibm.websphere.nd.multiplatform.doc/ae/rxml_prop_file_syntax.html).
 
 ## Inputs
 
+<!-- markdownlint-disable MD013 -->
 | Name        | Required | Description                      | Possible values                |
 |-------------|----------|----------------------------------|--------------------------------|
 | input       | Yes      | Path to the file to be converted | _&lt;Path&gt;_                 |
 | from        | Yes      | Format of a data in `input` file | `json`, `xml`, `yaml`, `props` |
 | to          | Yes      | Format of a data as a result     | `json`, `xml`, `yaml`, `props` |
+<!-- markdownlint-enable MD013 -->
 
 ## Outputs
 
