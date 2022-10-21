@@ -1,6 +1,6 @@
 ---
 default_stages: ["commit"]
-exclude: ^(.gitleaks\.toml|dist/.*\.js)$
+exclude: ^.gitleaks\.toml$
 repos:
   # Security
   - repo: https://github.com/Yelp/detect-secrets
