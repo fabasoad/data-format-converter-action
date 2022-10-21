@@ -1,6 +1,5 @@
 ---
 extends: default
-ignore-from-file: .yamllintignore
 
 rules:
   line-length:
