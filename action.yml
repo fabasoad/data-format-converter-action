@@ -1,7 +1,7 @@
 ---
-name: 'YAML/JSON/XML Converter Action'
+name: 'Data Format Converter Action'
 author: Yevhen Fabizhevskyi
-description: 'This action takes file that in YAML/JSON/XML format and produces it in output in YAML/JSON/XML format.'
+description: 'This action converts file with one format to another format, e.g. from JSON to XML, from YAML to JSON, etc.'
 branding:
   icon: copy
   color: green
@@ -65,8 +65,12 @@ runs:
           echo "YQ_EXEC=yq" >> $GITHUB_OUTPUT
         fi
       shell: bash
+    - name: Check same from and to
+      if: ${{ inputs.from == inputs.to }}
+      run: cp "${{ inputs.input }}" "${{ steps.yq_info.outputs.YQ_TEMP_FILE }}"
+      shell: bash
     - name: Install mikefarah/yq (Linux / macOS)
-      if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && runner.os != 'Windows' }}
+      if: ${{ inputs.from != inputs.to && steps.yq_info.outputs.YQ_INSTALLED == 'false' && runner.os != 'Windows' }}
       env:
         YQ_URL: https://github.com/mikefarah/yq/releases/download/${{ steps.yq_info.outputs.YQ_VERSION }}/${{ steps.yq_info.outputs.YQ_BINARY }}
       run: |
@@ -75,22 +79,23 @@ runs:
         chmod +x ${{ steps.yq_info.outputs.YQ_EXEC }}
       shell: bash
     - name: Install mikefarah/yq (Windows)
-      if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && runner.os == 'Windows' }}
+      if: ${{ inputs.from != inputs.to && steps.yq_info.outputs.YQ_INSTALLED == 'false' && runner.os == 'Windows' }}
       env:
         YQ_URL: https://github.com/mikefarah/yq/releases/download/${{ steps.yq_info.outputs.YQ_VERSION }}/${{ steps.yq_info.outputs.YQ_BINARY }}
       run: Invoke-WebRequest -URI $Env:YQ_URL -OutFile ${{ steps.yq_info.outputs.YQ_EXEC }}
       shell: pwsh
     - name: Add mikefarah/yq to PATH
-      if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' }}
+      if: ${{ inputs.from != inputs.to && steps.yq_info.outputs.YQ_INSTALLED == 'false' }}
       run: |
         echo "$(pwd)" >> $GITHUB_PATH
         echo "::debug::${{ steps.yq_info.outputs.YQ_BINARY }}@${{ steps.yq_info.outputs.YQ_VERSION }} has been installed"
       shell: bash
     - name: Convert
+      if: ${{ inputs.from != inputs.to }}
       run: ${{ steps.yq_info.outputs.YQ_EXEC }} -P '${{ inputs.input }}' -p=${{ inputs.from }} -o=${{ inputs.to }} > '${{ steps.yq_info.outputs.YQ_TEMP_FILE }}'
       shell: bash
     - name: Uninstall mikefarah/yq
-      if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' }}
+      if: ${{ inputs.from != inputs.to && steps.yq_info.outputs.YQ_INSTALLED == 'false' }}
       run: rm -f ${{ steps.yq_info.outputs.YQ_EXEC }}
       shell: bash
     # Output

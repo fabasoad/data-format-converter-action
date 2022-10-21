@@ -19,7 +19,7 @@ jobs:
         os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
         from: ['yaml', 'json', 'xml', 'props']
         to: ['yaml', 'json', 'xml', 'props']
-        exclude:
+        include:
           - from: 'yaml'
             to: 'yaml'
           - from: 'json'

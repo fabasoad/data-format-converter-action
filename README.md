@@ -1,23 +1,23 @@
 # Data format converter action
 
-![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/fabasoad/data-format-converter-action?include_prereleases)
+![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/fabasoad/data-format-converter-action?include_prereleases) ![Functional Tests](https://github.com/fabasoad/data-format-converter-action/workflows/Functional%20tests/badge.svg)
 
-Converts YAML/JSON/XML/TOML file formats interchangeably.
+Converts data formats interchangeably. The following formats are supported: [XML](https://www.w3schools.com/xml/),
+[YAML](https://yaml.org/), [JSON](https://www.json.org/json-en.html), [PROPS](https://www.ibm.com/docs/en/was/8.5.5?topic=SSEQTP_8.5.5/com.ibm.websphere.nd.multiplatform.doc/ae/rxml_prop_file_syntax.html).
 
 ## Inputs
 
-| Name        | Required | Description                               | Possible values               | Default |
-|-------------|----------|-------------------------------------------|-------------------------------|---------|
-| input       | Yes      | Path to the file to be converted          | _&lt;Path&gt;_ or data itself |         |
-| from        | Yes      | Format of a file                          | `json`, `xml`, `yaml`, `toml` |         |
-| to          | Yes      | Format of a file as a result              | `json`, `xml`, `yaml`, `toml` |         |
-| output-type | No       | Type of the result                        | `file`, `data`                | `data`  |
+| Name        | Required | Description                      | Possible values                |
+|-------------|----------|----------------------------------|--------------------------------|
+| input       | Yes      | Path to the file to be converted | _&lt;Path&gt;_                 |
+| from        | Yes      | Format of a data in `input` file | `json`, `xml`, `yaml`, `props` |
+| to          | Yes      | Format of a data as a result     | `json`, `xml`, `yaml`, `props` |
 
 ## Outputs
 
-| Name   | Required | Description                                                                                                                              |
-|--------|----------|------------------------------------------------------------------------------------------------------------------------------------------|
-| output | Yes      | Path to the file with the data in case of `output-type` is `path`, otherwise - data itself. Data is in a format defined in `to` argument |
+| Name   | Required | Description                                            |
+|--------|----------|--------------------------------------------------------|
+| output | Yes      | Converted data is in a format defined in `to` argument |
 
 ## Examples
 
@@ -33,9 +33,6 @@ version: '3.7'
 services:
   mongo:
     image: mongo:4.2.3-bionic
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: abc123
     networks:
       - test-network
 
@@ -70,8 +67,24 @@ jobs:
 
 #### 1.3. Result
 
-```bash
-
+```json
+{
+  "version": 3.7,
+  "services": {
+    "mongo": {
+      "image": "mongo:4.2.3-bionic",
+      "networks": [
+        "test-network"
+      ]
+    }
+  },
+  "networks": {
+    "test-network": {
+      "name": "test-network",
+      "driver": "bridge"
+    }
+  }
+}
 ```
 
 ### 2. XML to YAML
@@ -115,8 +128,27 @@ jobs:
 
 #### 2.3. Result
 
-```bash
-
+```yaml
+person:
+  name: John Doe
+  age: 32
+  hobbies:
+    - Music
+    - PC Games
 ```
 
-> _Hint:_ If you define the same format for `from` and `to` parameters you can use this action to read the file :wink:
+## FAQ
+
+> What if `from` and `to` are the same?
+
+There will not be error or any exception in this case. Result will be read from
+`input` and returned as `output`.
+
+> What OS are supported? I need to understand what type of runners I can use.
+
+The following OS are supported: `macOS ARM64`, `macOS AMD64`, `Windows x86`,
+`Windows AMD64`, `Linux x86`, `Linux ARM`, `Linux ARM64`, `Linux AMD64`.
+
+If you find that some of these OS don't work please open an [issue](https://github.com/fabasoad/data-format-converter-action/issues/new?assignees=fabasoad&labels=bug&template=bug_report.md&title=)
+or [PR](https://github.com/fabasoad/data-format-converter-action/compare) with
+the fix. Thanks!
