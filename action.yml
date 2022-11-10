@@ -85,6 +85,7 @@ runs:
       run: |
         wget $YQ_URL -O .
         chmod +x yq
+      shell: bash
     - name: Install mikefarah/yq (Windows)
       if: ${{ inputs.from != inputs.to && steps.yq_info.outputs.YQ_INSTALLED == 'false' && runner.os == 'Windows' }}
       env:
