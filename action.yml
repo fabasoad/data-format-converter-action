@@ -83,7 +83,7 @@ runs:
       env:
         YQ_URL: https://github.com/mikefarah/yq/releases/download/${{ steps.yq_info.outputs.YQ_VERSION }}/${{ steps.yq_info.outputs.YQ_BINARY }}
       run: |
-        wget $YQ_URL -O .
+        wget $YQ_URL
         chmod +x yq
       shell: bash
     - name: Install mikefarah/yq (Windows)
