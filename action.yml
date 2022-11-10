@@ -79,7 +79,7 @@ runs:
         chmod +x ${{ steps.yq_info.outputs.YQ_EXEC }}
       shell: bash
     - name: Install mikefarah/yq (Linux AMD64)
-      if: ${{ steps.check_yq.outputs.exists == false && inputs.from != 'xml' && runner.os == 'Linux' && runner.arch == 'X64' }}
+      if: ${{ steps.yq_info.outputs.YQ_INSTALLED == 'false' && runner.os == 'Linux' && runner.arch == 'X64' }}
       env:
         YQ_URL: https://github.com/mikefarah/yq/releases/download/${{ steps.yq_info.outputs.YQ_VERSION }}/${{ steps.yq_info.outputs.YQ_BINARY }}
       run: |
