@@ -70,7 +70,7 @@ runs:
       run: cp "${{ inputs.input }}" "${{ steps.yq_info.outputs.YQ_TEMP_FILE }}"
       shell: bash
     - name: Install mikefarah/yq (Linux / macOS)
-      if: ${{ inputs.from != inputs.to && steps.yq_info.outputs.YQ_INSTALLED == 'false' && runner.os != 'Windows' && runner.arch != 'X64' }}
+      if: ${{ inputs.from != inputs.to && steps.yq_info.outputs.YQ_INSTALLED == 'false' && runner.os != 'Windows' }}
       env:
         YQ_URL: https://github.com/mikefarah/yq/releases/download/${{ steps.yq_info.outputs.YQ_VERSION }}/${{ steps.yq_info.outputs.YQ_BINARY }}
       run: |
