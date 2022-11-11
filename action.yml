@@ -1,7 +1,7 @@
 ---
 name: 'Data Format Converter Action'
 author: Yevhen Fabizhevskyi
-description: 'This action converts file with one format to another format, e.g. from JSON to XML, from YAML to JSON, etc.'
+description: 'GitHub action that converts YAML / JSON / XML / PROPS data formats interchangeably'
 branding:
   icon: copy
   color: green
@@ -23,9 +23,9 @@ runs:
   using: 'composite'
   steps:
     - name: Collect yq info
-      id: yq_info
+      id: info
       env:
-        YQ_VERSION: v4.28.1
+        YQ_VERSION: v4.30.1
         YQ_TEMP_FILE: .data-format-converter-action
       run: |
         echo "YQ_VERSION=$YQ_VERSION" >> $GITHUB_OUTPUT
@@ -67,43 +67,42 @@ runs:
       shell: bash
     - name: Check same from and to
       if: ${{ inputs.from == inputs.to }}
-      run: cp "${{ inputs.input }}" "${{ steps.yq_info.outputs.YQ_TEMP_FILE }}"
+      run: cp "${{ inputs.input }}" "${{ steps.info.outputs.YQ_TEMP_FILE }}"
       shell: bash
     - name: Install mikefarah/yq (Linux / macOS)
-      if: ${{ inputs.from != inputs.to && steps.yq_info.outputs.YQ_INSTALLED == 'false' && runner.os != 'Windows' }}
+      if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' && runner.os != 'Windows' }}
       env:
-        YQ_URL: https://github.com/mikefarah/yq/releases/download/${{ steps.yq_info.outputs.YQ_VERSION }}/${{ steps.yq_info.outputs.YQ_BINARY }}
+        YQ_URL: https://github.com/mikefarah/yq/releases/download/${{ steps.info.outputs.YQ_VERSION }}/${{ steps.info.outputs.YQ_BINARY }}
       run: |
         wget $YQ_URL
-        mv ${{ steps.yq_info.outputs.YQ_BINARY }} ${{ steps.yq_info.outputs.YQ_EXEC }}
-        chmod +x ${{ steps.yq_info.outputs.YQ_EXEC }}
+        mv ${{ steps.info.outputs.YQ_BINARY }} ${{ steps.info.outputs.YQ_EXEC }}
+        chmod +x ${{ steps.info.outputs.YQ_EXEC }}
       shell: bash
     - name: Install mikefarah/yq (Windows)
-      if: ${{ inputs.from != inputs.to && steps.yq_info.outputs.YQ_INSTALLED == 'false' && runner.os == 'Windows' }}
+      if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' && runner.os == 'Windows' }}
       env:
-        YQ_URL: https://github.com/mikefarah/yq/releases/download/${{ steps.yq_info.outputs.YQ_VERSION }}/${{ steps.yq_info.outputs.YQ_BINARY }}
-      run: Invoke-WebRequest -URI $Env:YQ_URL -OutFile ${{ steps.yq_info.outputs.YQ_EXEC }}
+        YQ_URL: https://github.com/mikefarah/yq/releases/download/${{ steps.info.outputs.YQ_VERSION }}/${{ steps.info.outputs.YQ_BINARY }}
+      run: Invoke-WebRequest -URI $Env:YQ_URL -OutFile ${{ steps.info.outputs.YQ_EXEC }}
       shell: pwsh
     - name: Add mikefarah/yq to PATH
-      if: ${{ inputs.from != inputs.to && steps.yq_info.outputs.YQ_INSTALLED == 'false' }}
+      if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' }}
       run: |
         echo "$(pwd)" >> $GITHUB_PATH
-        echo "::debug::${{ steps.yq_info.outputs.YQ_BINARY }}@${{ steps.yq_info.outputs.YQ_VERSION }} has been installed"
+        echo "::debug::${{ steps.info.outputs.YQ_BINARY }}@${{ steps.info.outputs.YQ_VERSION }} has been installed"
       shell: bash
     - name: Convert
       if: ${{ inputs.from != inputs.to }}
-      run: ${{ steps.yq_info.outputs.YQ_EXEC }} -P '${{ inputs.input }}' -p=${{ inputs.from }} -o=${{ inputs.to }} > '${{ steps.yq_info.outputs.YQ_TEMP_FILE }}'
+      run: ${{ steps.info.outputs.YQ_EXEC }} -P '${{ inputs.input }}' -p=${{ inputs.from }} -o=${{ inputs.to }} > '${{ steps.info.outputs.YQ_TEMP_FILE }}'
       shell: bash
     - name: Uninstall mikefarah/yq
-      if: ${{ inputs.from != inputs.to && steps.yq_info.outputs.YQ_INSTALLED == 'false' }}
-      run: rm -f ${{ steps.yq_info.outputs.YQ_EXEC }}
+      if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' }}
+      run: rm -f ${{ steps.info.outputs.YQ_EXEC }}
       shell: bash
-    # Output
     - name: Save output
       id: result
       uses: actions/github-script@v6
       with:
         script: |
           const fs = require('fs');
-          core.setOutput('data', fs.readFileSync('${{ steps.yq_info.outputs.YQ_TEMP_FILE }}', 'utf-8').replace(/\s+$/gm, ''));
-          fs.unlinkSync('${{ steps.yq_info.outputs.YQ_TEMP_FILE }}');
+          core.setOutput('data', fs.readFileSync('${{ steps.info.outputs.YQ_TEMP_FILE }}', 'utf-8').replace(/\s+$/gm, ''));
+          fs.unlinkSync('${{ steps.info.outputs.YQ_TEMP_FILE }}');
