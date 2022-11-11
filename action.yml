@@ -74,7 +74,7 @@ runs:
       env:
         YQ_URL: https://github.com/mikefarah/yq/releases/download/${{ steps.yq_info.outputs.YQ_VERSION }}/${{ steps.yq_info.outputs.YQ_BINARY }}
       run: |
-        wget $YQ_URL -O .
+        wget $YQ_URL
         mv ${{ steps.yq_info.outputs.YQ_BINARY }} ${{ steps.yq_info.outputs.YQ_EXEC }}
         chmod +x ${{ steps.yq_info.outputs.YQ_EXEC }}
       shell: bash
