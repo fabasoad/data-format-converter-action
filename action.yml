@@ -25,7 +25,7 @@ runs:
     - name: Collect yq info
       id: info
       env:
-        YQ_VERSION: v4.30.1
+        YQ_VERSION: v4.30.4
         YQ_TEMP_FILE: .data-format-converter-action
       run: |
         echo "YQ_VERSION=$YQ_VERSION" >> $GITHUB_OUTPUT

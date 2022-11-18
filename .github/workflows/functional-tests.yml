@@ -1,7 +1,11 @@
 ---
 name: Functional tests
 
-on: [pull_request]
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
 
 jobs:
   convert:
@@ -40,7 +44,7 @@ jobs:
           echo 's.v = 1' > expected.props
           echo 's.m.0 = t1' >> expected.props
           echo 's.m.1 = t2' >> expected.props
-        shell: bash
+        shell: sh
       - name: Convert
         uses: ./
         id: convert
@@ -50,13 +54,13 @@ jobs:
           to: ${{ matrix.to }}
       - name: Save result
         run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
-        shell: bash
+        shell: sh
       - name: Print actual file
         run: cat actual.${{ matrix.to }}
-        shell: bash
+        shell: sh
       - name: Validate
         run: cmp -s "expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
-        shell: bash
+        shell: sh
       - name: Clean
         run: |
           rm -f expected.yaml
@@ -64,7 +68,7 @@ jobs:
           rm -f expected.xml
           rm -f expected.props
           rm -f actual.${{ matrix.to }}
-        shell: bash
+        shell: sh
   convert-alpine:
     name: Convert (alpine-latest)
     timeout-minutes: 5
@@ -105,7 +109,7 @@ jobs:
           echo 's.v = 1' > expected.props
           echo 's.m.0 = t1' >> expected.props
           echo 's.m.1 = t2' >> expected.props
-        shell: bash
+        shell: sh
       - name: Convert
         uses: ./
         id: convert
@@ -115,13 +119,13 @@ jobs:
           to: ${{ matrix.to }}
       - name: Save result
         run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
-        shell: bash
+        shell: sh
       - name: Print actual file
         run: cat actual.${{ matrix.to }}
         shell: bash
       - name: Validate
         run: cmp -s "expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
-        shell: bash
+        shell: sh
       - name: Clean
         run: |
           rm -f expected.yaml
@@ -129,4 +133,4 @@ jobs:
           rm -f expected.xml
           rm -f expected.props
           rm -f actual.${{ matrix.to }}
-        shell: bash
+        shell: sh
