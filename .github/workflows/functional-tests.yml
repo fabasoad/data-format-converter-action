@@ -82,9 +82,6 @@ jobs:
       image: alpine:latest
     steps:
       - uses: actions/checkout@v3
-#      - name: Install tools
-#        run: apk --update add bash
-#        shell: sh
       - name: Prepare
         run: |
           echo 's:' > expected.yaml
