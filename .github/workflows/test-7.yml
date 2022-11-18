@@ -17,7 +17,7 @@ jobs:
         run: wget https://raw.githubusercontent.com/dvgamerr/scgp-cicd-integation/main/pom.xml -O pom.xml
         shell: sh
       - name: Convert
-        uses: ./
+        uses: fabasoad/data-format-converter-action@main
         id: convert
         with:
           input: ./pom.xml
