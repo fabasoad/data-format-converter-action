@@ -13,11 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Download pom.xml
+        run: wget https://raw.githubusercontent.com/dvgamerr/scgp-cicd-integation/main/pom.xml -O pom.xml
+        shell: sh
       - name: Convert
         uses: ./
         id: convert
         with:
-          input: .github/fixture/pom.xml
+          input: ./pom.xml
           from: xml
           to: json
       - name: Save result
