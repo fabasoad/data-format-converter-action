@@ -100,9 +100,4 @@ runs:
         script: |
           const fs = require('fs');
           core.setOutput('data', fs.readFileSync('${{ steps.info.outputs.YQ_TEMP_FILE }}', 'utf-8').replace(/\s+$/gm, ''));
-    - name: Clean up
-      if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' }}
-      run: |
-        rm -f ${{ steps.info.outputs.YQ_EXEC }}
-        rm -f ${{ steps.info.outputs.YQ_TEMP_FILE }}
-      shell: sh
+          fs.unlinkSync('${{ steps.info.outputs.YQ_TEMP_FILE }}');
