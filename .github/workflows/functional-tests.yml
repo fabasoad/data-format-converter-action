@@ -125,6 +125,8 @@ jobs:
       - name: Install dependencies
         if: ${{ matrix.image == 'centos' }}
         run: |
+          sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
+          sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
           yum update -y
           yum install diffutils
         shell: sh
