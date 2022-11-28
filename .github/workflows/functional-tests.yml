@@ -14,10 +14,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+        os: ['ubuntu', 'windows', 'macos']
         from: ['yaml', 'json', 'xml', 'props']
         to: ['yaml', 'json', 'xml', 'props']
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
     steps:
       - uses: actions/checkout@v3
       - name: Prepare
@@ -69,17 +69,18 @@ jobs:
           rm -f expected.props
           rm -f actual.${{ matrix.to }}
         shell: sh
-  convert-alpine:
-    name: Convert (alpine-latest)
+  convert-container:
+    name: Convert
     timeout-minutes: 5
     strategy:
       fail-fast: false
       matrix:
+        image: ['alpine', 'centos']
         from: ['yaml', 'json', 'xml', 'props']
         to: ['yaml', 'json', 'xml', 'props']
     runs-on: ubuntu-latest
     container:
-      image: alpine:latest
+      image: ${{ matrix.image }}:latest
     steps:
       - uses: actions/checkout@v3
       - name: Prepare
@@ -119,6 +120,14 @@ jobs:
         shell: sh
       - name: Print actual file
         run: cat actual.${{ matrix.to }}
+        shell: sh
+      - name: Install dependencies
+        if: ${{ matrix.image == 'centos' }}
+        run: |
+          sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
+          sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
+          yum update -y
+          yum install diffutils
         shell: sh
       - name: Validate
         run: cmp -s "expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "expected.${{ matrix.to }}" "actual.${{ matrix.to }}"

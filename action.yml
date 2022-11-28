@@ -25,13 +25,13 @@ runs:
     - name: Collect yq info
       id: info
       env:
-        YQ_VERSION: v4.30.4
+        YQ_VERSION: 4.30.5
         YQ_TEMP_FILE: .data-format-converter-action
       run: |
         echo "YQ_VERSION=$YQ_VERSION" >> $GITHUB_OUTPUT
         echo "YQ_TEMP_FILE=$YQ_TEMP_FILE" >> $GITHUB_OUTPUT
-        result=$(if command -v yq >/dev/null 2>&1; then echo true; else echo false; fi)
-        echo "YQ_INSTALLED=$result" >> $GITHUB_OUTPUT
+        YQ_INSTALLED=$(if command -v yq >/dev/null 2>&1; then echo true; else echo false; fi)
+        echo "YQ_INSTALLED=$YQ_INSTALLED" >> $GITHUB_OUTPUT
         if [ "${{ runner.os }}" = "macOS" ]; then
           if [ "${{ runner.arch }}" = "ARM64" ]; then
             YQ_BINARY=yq_darwin_arm64
@@ -69,34 +69,29 @@ runs:
       if: ${{ inputs.from == inputs.to }}
       run: cp "${{ inputs.input }}" "${{ steps.info.outputs.YQ_TEMP_FILE }}"
       shell: sh
-    - name: Install mikefarah/yq (Linux / macOS)
-      if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' && runner.os != 'Windows' }}
-      env:
-        YQ_URL: https://github.com/mikefarah/yq/releases/download/${{ steps.info.outputs.YQ_VERSION }}/${{ steps.info.outputs.YQ_BINARY }}
-      run: |
-        wget $YQ_URL
-        mv ${{ steps.info.outputs.YQ_BINARY }} ${{ steps.info.outputs.YQ_EXEC }}
-        chmod +x ${{ steps.info.outputs.YQ_EXEC }}
-      shell: sh
-    - name: Install mikefarah/yq (Windows)
-      if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' && runner.os == 'Windows' }}
-      env:
-        YQ_URL: https://github.com/mikefarah/yq/releases/download/${{ steps.info.outputs.YQ_VERSION }}/${{ steps.info.outputs.YQ_BINARY }}
-      run: Invoke-WebRequest -URI $Env:YQ_URL -OutFile ${{ steps.info.outputs.YQ_EXEC }}
-      shell: pwsh
-    - name: Add mikefarah/yq to PATH
+    - name: Download mikefarah/yq
+      if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' }}
+      uses: robinraju/release-downloader@v1.6
+      with:
+        repository: mikefarah/yq
+        latest: false
+        tag: v${{ steps.info.outputs.YQ_VERSION }}
+        fileName: ${{ steps.info.outputs.YQ_BINARY }}
+        tarBall: false
+        zipBall: false
+    - name: Install mikefarah/yq
       if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' }}
       run: |
+        mv ${{ steps.info.outputs.YQ_BINARY }} ${{ steps.info.outputs.YQ_EXEC }}
+        if [ "${{ runner.os }}" != "Windows" ]; then
+          chmod +x ${{ steps.info.outputs.YQ_EXEC }}
+        fi
         echo "$(pwd)" >> $GITHUB_PATH
         echo "::debug::${{ steps.info.outputs.YQ_BINARY }}@${{ steps.info.outputs.YQ_VERSION }} has been installed"
       shell: sh
     - name: Convert
       if: ${{ inputs.from != inputs.to }}
       run: ${{ steps.info.outputs.YQ_EXEC }} -P '${{ inputs.input }}' -p=${{ inputs.from }} -o=${{ inputs.to }} > '${{ steps.info.outputs.YQ_TEMP_FILE }}'
-      shell: sh
-    - name: Uninstall mikefarah/yq
-      if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' }}
-      run: rm -f ${{ steps.info.outputs.YQ_EXEC }}
       shell: sh
     - name: Save output
       id: result
