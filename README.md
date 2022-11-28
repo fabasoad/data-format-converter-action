@@ -153,10 +153,13 @@ person:
 There will not be error or any exception in this case. Result will be read from
 `input` and returned as `output`.
 
-> What OS are supported? I need to understand what type of runners I can use.
+> What OS and architectures are supported? I need to understand what type of
+> runners I can use.
 
-The following OS are supported: `macOS ARM64`, `macOS AMD64`, `Windows x86`,
-`Windows AMD64`, `Linux x86`, `Linux ARM`, `Linux ARM64`, `Linux AMD64`.
+The following environments are supported:
+
+- OS: `macOS`, `Windows`, `Ubuntu`, `Alpine`, `CentOS`.
+- Arch: `ARM`, `ARM64`, `x86`, `x64`.
 
 If you find that some of these OS don't work please open an [issue](https://github.com/fabasoad/data-format-converter-action/issues/new?assignees=fabasoad&labels=bug&template=bug_report.md&title=)
 or [PR](https://github.com/fabasoad/data-format-converter-action/compare) with

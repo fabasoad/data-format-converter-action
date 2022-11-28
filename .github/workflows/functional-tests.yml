@@ -8,75 +8,74 @@ on:
   pull_request:
 
 jobs:
-#  convert:
-#    name: Convert
-#    timeout-minutes: 5
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        os: ['ubuntu', 'windows', 'macos']
-#        from: ['yaml', 'json', 'xml', 'props']
-#        to: ['yaml', 'json', 'xml', 'props']
-#    runs-on: ${{ matrix.os }}-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#      - name: Prepare
-#        run: |
-#          echo 's:' > expected.yaml
-#          echo '  v: "1"' >> expected.yaml
-#          echo '  m:' >> expected.yaml
-#          echo '    - t1' >> expected.yaml
-#          echo '    - t2' >> expected.yaml
-#          echo '{' > expected.json
-#          echo '  "s": {' >> expected.json
-#          echo '    "v": "1",' >> expected.json
-#          echo '    "m": [' >> expected.json
-#          echo '      "t1",' >> expected.json
-#          echo '      "t2"' >> expected.json
-#          echo '    ]' >> expected.json
-#          echo '  }' >> expected.json
-#          echo '}' >> expected.json
-#          echo '<s>' > expected.xml
-#          echo '  <v>1</v>' >> expected.xml
-#          echo '  <m>t1</m>' >> expected.xml
-#          echo '  <m>t2</m>' >> expected.xml
-#          echo '</s>' >> expected.xml
-#          echo 's.v = 1' > expected.props
-#          echo 's.m.0 = t1' >> expected.props
-#          echo 's.m.1 = t2' >> expected.props
-#        shell: sh
-#      - name: Convert
-#        uses: ./
-#        id: convert
-#        with:
-#          input: expected.${{ matrix.from }}
-#          from: ${{ matrix.from }}
-#          to: ${{ matrix.to }}
-#      - name: Save result
-#        run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
-#        shell: sh
-#      - name: Print actual file
-#        run: cat actual.${{ matrix.to }}
-#        shell: sh
-#      - name: Validate
-#        run: cmp -s "expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
-#        shell: sh
-#      - name: Clean
-#        run: |
-#          rm -f expected.yaml
-#          rm -f expected.json
-#          rm -f expected.xml
-#          rm -f expected.props
-#          rm -f actual.${{ matrix.to }}
-#        shell: sh
+  convert:
+    name: Convert
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu', 'windows', 'macos']
+        from: ['yaml', 'json', 'xml', 'props']
+        to: ['yaml', 'json', 'xml', 'props']
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Prepare
+        run: |
+          echo 's:' > expected.yaml
+          echo '  v: "1"' >> expected.yaml
+          echo '  m:' >> expected.yaml
+          echo '    - t1' >> expected.yaml
+          echo '    - t2' >> expected.yaml
+          echo '{' > expected.json
+          echo '  "s": {' >> expected.json
+          echo '    "v": "1",' >> expected.json
+          echo '    "m": [' >> expected.json
+          echo '      "t1",' >> expected.json
+          echo '      "t2"' >> expected.json
+          echo '    ]' >> expected.json
+          echo '  }' >> expected.json
+          echo '}' >> expected.json
+          echo '<s>' > expected.xml
+          echo '  <v>1</v>' >> expected.xml
+          echo '  <m>t1</m>' >> expected.xml
+          echo '  <m>t2</m>' >> expected.xml
+          echo '</s>' >> expected.xml
+          echo 's.v = 1' > expected.props
+          echo 's.m.0 = t1' >> expected.props
+          echo 's.m.1 = t2' >> expected.props
+        shell: sh
+      - name: Convert
+        uses: ./
+        id: convert
+        with:
+          input: expected.${{ matrix.from }}
+          from: ${{ matrix.from }}
+          to: ${{ matrix.to }}
+      - name: Save result
+        run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
+        shell: sh
+      - name: Print actual file
+        run: cat actual.${{ matrix.to }}
+        shell: sh
+      - name: Validate
+        run: cmp -s "expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
+        shell: sh
+      - name: Clean
+        run: |
+          rm -f expected.yaml
+          rm -f expected.json
+          rm -f expected.xml
+          rm -f expected.props
+          rm -f actual.${{ matrix.to }}
+        shell: sh
   convert-container:
     name: Convert
     timeout-minutes: 5
     strategy:
       fail-fast: false
       matrix:
-#        image: ['alpine', 'centos']
-        image: ['centos']
+        image: ['alpine', 'centos']
         from: ['yaml', 'json', 'xml', 'props']
         to: ['yaml', 'json', 'xml', 'props']
     runs-on: ubuntu-latest
