@@ -59,6 +59,11 @@ runs:
           exit 1
         fi
         echo "YQ_BINARY=$YQ_BINARY" >> $GITHUB_OUTPUT
+        if [ "${{ runner.os }}" = "Windows" ]; then
+          echo "YQ_EXEC=yq.exe" >> $GITHUB_OUTPUT
+        else
+          echo "YQ_EXEC=yq" >> $GITHUB_OUTPUT
+        fi
       shell: sh
     - name: Check same from and to
       if: ${{ inputs.from == inputs.to }}
@@ -77,14 +82,16 @@ runs:
     - name: Install mikefarah/yq
       if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' }}
       run: |
+        mv ${{ steps.info.outputs.YQ_BINARY }} ${{ steps.info.outputs.YQ_EXEC }}
         if [ "${{ runner.os }}" != "Windows" ]; then
-          chmod +x ${{ steps.info.outputs.YQ_BINARY }}
+          chmod +x ${{ steps.info.outputs.YQ_EXEC }}
         fi
+        echo "$(pwd)" >> $GITHUB_PATH
         echo "::debug::${{ steps.info.outputs.YQ_BINARY }}@${{ steps.info.outputs.YQ_VERSION }} has been installed"
       shell: sh
     - name: Convert
       if: ${{ inputs.from != inputs.to }}
-      run: ./${{ steps.info.outputs.YQ_BINARY }} -P '${{ inputs.input }}' -p=${{ inputs.from }} -o=${{ inputs.to }} > '${{ steps.info.outputs.YQ_TEMP_FILE }}'
+      run: ${{ steps.info.outputs.YQ_EXEC }} -P '${{ inputs.input }}' -p=${{ inputs.from }} -o=${{ inputs.to }} > '${{ steps.info.outputs.YQ_TEMP_FILE }}'
       shell: sh
     - name: Save output
       id: result
@@ -96,6 +103,6 @@ runs:
     - name: Clean up
       if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' }}
       run: |
-        rm -f ${{ steps.info.outputs.YQ_BINARY }}
+        rm -f ${{ steps.info.outputs.YQ_EXEC }}
         rm -f ${{ steps.info.outputs.YQ_TEMP_FILE }}
       shell: sh
