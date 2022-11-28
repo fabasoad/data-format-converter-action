@@ -125,6 +125,7 @@ jobs:
       - name: Install dependencies
         if: ${{ matrix.image == 'centos' }}
         run: |
+          yum update -y
           yum install diffutils
         shell: sh
       - name: Validate
