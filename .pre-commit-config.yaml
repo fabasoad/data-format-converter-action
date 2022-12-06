@@ -37,4 +37,5 @@ repos:
       - id: no-commit-to-branch
       - id: trailing-whitespace
 ci:
-  autofix_prs: false
+  autofix_prs: true
+  autoupdate_schedule: quarterly
