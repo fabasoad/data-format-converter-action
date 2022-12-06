@@ -7,13 +7,6 @@
 Converts data formats interchangeably. The following formats are supported: [XML](https://www.w3schools.com/xml/),
 [YAML](https://yaml.org/), [JSON](https://www.json.org/json-en.html), [PROPS](https://www.ibm.com/docs/en/was/8.5.5?topic=SSEQTP_8.5.5/com.ibm.websphere.nd.multiplatform.doc/ae/rxml_prop_file_syntax.html).
 
-## Prerequisites
-
-The following tools have to be installed for successful work of this GitHub action:
-
-- [wget](https://www.gnu.org/software/wget) for Unix based OS.
-- [PowerShell](https://learn.microsoft.com/en-us/powershell) for Windows.
-
 ## Inputs
 
 | Name        | Required | Description                      | Possible values                |
