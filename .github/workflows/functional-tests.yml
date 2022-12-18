@@ -61,7 +61,7 @@ jobs:
       - name: Validate
         run: cmp -s "expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
         shell: sh
-      - name: Clean
+      - name: Clean up
         run: |
           rm -f expected.yaml
           rm -f expected.json
@@ -132,7 +132,7 @@ jobs:
       - name: Validate
         run: cmp -s "expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
         shell: sh
-      - name: Clean
+      - name: Clean up
         run: |
           rm -f expected.yaml
           rm -f expected.json
