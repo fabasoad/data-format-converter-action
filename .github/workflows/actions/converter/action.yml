@@ -61,7 +61,7 @@ runs:
         yum install diffutils
       shell: sh
     - name: Validate
-      run: cmp -s "expected.${{ inputs.to }}" "actual.${{ inputs.to }}" || diff "expected.${{ inputs.to }}" "actual.${{ inputs.to }}"
+      run: cmp -s "expected.json" "actual.${{ inputs.to }}" || diff "expected.${{ inputs.to }}" "actual.${{ inputs.to }}"
       shell: sh
     - name: Clean up
       run: |

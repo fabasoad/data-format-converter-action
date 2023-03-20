@@ -23,7 +23,8 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/workflows/actions/converter
+      - name: Convert ${{ matrix.from }} to ${{ matrix.to }}
+        uses: ./.github/workflows/actions/converter
         with:
           from: ${{ matrix.from }}
           to: ${{ matrix.to }}
@@ -45,7 +46,8 @@ jobs:
       image: ${{ matrix.image }}:latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/workflows/actions/converter
+      - name: Convert ${{ matrix.from }} to ${{ matrix.to }}
+        uses: ./.github/workflows/actions/converter
         with:
           from: ${{ matrix.from }}
           to: ${{ matrix.to }}
