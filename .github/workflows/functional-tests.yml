@@ -22,6 +22,7 @@ jobs:
 #        to: ['yaml', 'json', 'xml', 'props']
     runs-on: ${{ matrix.os }}-latest
     steps:
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/actions/converter
         with:
           from: ${{ matrix.from }}
@@ -43,6 +44,7 @@ jobs:
     container:
       image: ${{ matrix.image }}:latest
     steps:
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/actions/converter
         with:
           from: ${{ matrix.from }}

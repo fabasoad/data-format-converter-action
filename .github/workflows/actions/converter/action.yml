@@ -14,7 +14,6 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - uses: actions/checkout@v3
     - name: Prepare
       run: |
         echo 's:' > expected.yaml
