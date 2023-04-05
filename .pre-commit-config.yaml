@@ -11,7 +11,7 @@ repos:
       - id: detect-secrets
         stages: ["commit", "push"]
   - repo: https://github.com/zricethezav/gitleaks
-    rev: v8.16.1
+    rev: v8.16.2
     hooks:
       - id: gitleaks
         stages: ["commit", "push"]
@@ -22,7 +22,7 @@ repos:
       - id: markdownlint
   # Yaml
   - repo: https://github.com/adrienverge/yamllint
-    rev: v1.29.0
+    rev: v1.30.0
     hooks:
       - id: yamllint
   # Other
