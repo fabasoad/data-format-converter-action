@@ -5,7 +5,6 @@ on: # yamllint disable-line rule:truthy
   push:
     branches:
       - main
-      - pre-commit-ci-update-config
   pull_request:
 
 defaults:
@@ -35,7 +34,7 @@ jobs:
           pre-commit run --to-ref ${{ github.sha }} --from-ref origin/${{ github.base_ref }} --hook-stage=commit
           pre-commit run --to-ref ${{ github.sha }} --from-ref origin/${{ github.base_ref }} --hook-stage=push
       - name: Run pre-commit on all files
-        #        if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
+        if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
         run: |
           pre-commit run --hook-stage=commit --all-files
           pre-commit run --hook-stage=push --all-files
