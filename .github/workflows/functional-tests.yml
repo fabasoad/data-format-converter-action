@@ -1,10 +1,10 @@
 ---
 name: Functional tests
 
-on:  # yamllint disable-line rule:truthy
+on: # yamllint disable-line rule:truthy
   push:
     branches:
-      - 'main'
+      - "main"
   pull_request:
 
 jobs:
@@ -14,9 +14,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu', 'windows', 'macos']
-        from: ['yaml', 'json', 'xml', 'props']
-        to: ['yaml', 'json', 'xml', 'props']
+        os: ["ubuntu", "windows", "macos"]
+        from: ["yaml", "json", "xml", "props"]
+        to: ["yaml", "json", "xml", "props"]
     runs-on: ${{ matrix.os }}-latest
     steps:
       - uses: actions/checkout@v3
@@ -75,9 +75,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: ['alpine', 'centos']
-        from: ['yaml', 'json', 'xml', 'props']
-        to: ['yaml', 'json', 'xml', 'props']
+        image: ["alpine", "centos"]
+        from: ["yaml", "json", "xml", "props"]
+        to: ["yaml", "json", "xml", "props"]
     runs-on: ubuntu-latest
     container:
       image: ${{ matrix.image }}:latest
