@@ -3,24 +3,28 @@
 [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://stand-with-ukraine.pp.ua)
 ![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/fabasoad/data-format-converter-action?include_prereleases)
 ![Functional Tests](https://github.com/fabasoad/data-format-converter-action/workflows/Functional%20tests/badge.svg)
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/fabasoad/data-format-converter-action/main.svg)](https://results.pre-commit.ci/latest/github/fabasoad/data-format-converter-action/main)
+![pre-commit](https://github.com/fabasoad/data-format-converter-action/actions/workflows/pre-commit.yml/badge.svg)
 
 Converts data formats interchangeably. The following formats are supported: [XML](https://www.w3schools.com/xml/),
 [YAML](https://yaml.org/), [JSON](https://www.json.org/json-en.html), [PROPS](https://www.ibm.com/docs/en/was/8.5.5?topic=SSEQTP_8.5.5/com.ibm.websphere.nd.multiplatform.doc/ae/rxml_prop_file_syntax.html).
 
 ## Inputs
 
+<!-- prettier-ignore-start -->
 | Name        | Required | Description                      | Possible values                |
 |-------------|----------|----------------------------------|--------------------------------|
 | input       | Yes      | Path to the file to be converted | _&lt;Path&gt;_                 |
 | from        | Yes      | Format of a data in `input` file | `json`, `xml`, `yaml`, `props` |
 | to          | Yes      | Format of a data as a result     | `json`, `xml`, `yaml`, `props` |
+<!-- prettier-ignore-end -->
 
 ## Outputs
 
+<!-- prettier-ignore-start -->
 | Name   | Required | Description                                            |
 |--------|----------|--------------------------------------------------------|
 | output | Yes      | Converted data is in a format defined in `to` argument |
+<!-- prettier-ignore-end -->
 
 ## Examples
 
@@ -32,7 +36,7 @@ Converts data formats interchangeably. The following formats are supported: [XML
 content:
 
 ```yaml
-version: '3.7'
+version: "3.7"
 services:
   mongo:
     image: mongo:4.2.3-bionic
@@ -61,9 +65,9 @@ jobs:
       - uses: fabasoad/data-format-converter-action@main
         id: yaml2json
         with:
-          input: 'docker-compose.yml'
-          from: 'yaml'
-          to: 'json'
+          input: "docker-compose.yml"
+          from: "yaml"
+          to: "json"
       - name: Print result
         run: echo "${{ steps.yaml2json.outputs.output }}"
 ```
@@ -76,9 +80,7 @@ jobs:
   "services": {
     "mongo": {
       "image": "mongo:4.2.3-bionic",
-      "networks": [
-        "test-network"
-      ]
+      "networks": ["test-network"]
     }
   },
   "networks": {
@@ -122,9 +124,9 @@ jobs:
       - uses: fabasoad/data-format-converter-action@main
         id: xml2yaml
         with:
-          input: 'person.xml'
-          from: 'xml'
-          to: 'yaml'
+          input: "person.xml"
+          from: "xml"
+          to: "yaml"
       - name: Print result
         run: echo "${{ steps.xml2yaml.outputs.output }}"
 ```

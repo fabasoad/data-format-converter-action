@@ -1,31 +1,31 @@
 ---
-name: 'Data Format Converter Action'
+name: "Data Format Converter Action"
 author: Yevhen Fabizhevskyi
-description: 'GitHub action that converts YAML / JSON / XML / PROPS data formats interchangeably'
+description: "GitHub action that converts YAML / JSON / XML / PROPS data formats interchangeably"
 branding:
   icon: copy
   color: green
 inputs:
   input:
-    description: 'Path to the file with the data to be converted.'
+    description: "Path to the file with the data to be converted."
     required: true
   from:
-    description: 'Format of a file. Possible values: json, xml, yaml, props.'
+    description: "Format of a file. Possible values: json, xml, yaml, props."
     required: true
   to:
-    description: 'Format of a file as a result. Possible values: json, xml, yaml, props.'
+    description: "Format of a file as a result. Possible values: json, xml, yaml, props."
     required: true
 outputs:
   output:
-    description: 'Converted data.'
+    description: "Converted data."
     value: ${{ steps.result.outputs.data }}
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Collect yq info
       id: info
       env:
-        YQ_VERSION: 4.33.3
+        YQ_VERSION: 4.34.1
         YQ_TEMP_FILE: .data-format-converter-action
       run: |
         echo "YQ_VERSION=$YQ_VERSION" >> $GITHUB_OUTPUT
