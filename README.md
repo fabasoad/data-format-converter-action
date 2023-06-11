@@ -2,7 +2,7 @@
 
 [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://stand-with-ukraine.pp.ua)
 ![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/fabasoad/data-format-converter-action?include_prereleases)
-![Functional Tests](https://github.com/fabasoad/data-format-converter-action/workflows/Functional%20tests/badge.svg)
+![functional-tests](https://github.com/fabasoad/data-format-converter-action/actions/workflows/functional-tests.yml/badge.svg)
 ![pre-commit](https://github.com/fabasoad/data-format-converter-action/actions/workflows/pre-commit.yml/badge.svg)
 
 Converts data formats interchangeably. The following formats are supported: [XML](https://www.w3schools.com/xml/),
