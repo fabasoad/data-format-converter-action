@@ -9,7 +9,7 @@ repos:
     rev: v1.4.0
     hooks:
       - id: detect-secrets
-  - repo: https://github.com/zricethezav/gitleaks
+  - repo: https://github.com/gitleaks/gitleaks
     rev: v8.17.0
     hooks:
       - id: gitleaks
@@ -34,7 +34,7 @@ repos:
         stages: ["push"]
   # Other
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.0
+    rev: v3.0.1
     hooks:
       - id: prettier
         stages: ["commit"]
