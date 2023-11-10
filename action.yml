@@ -22,13 +22,17 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Get latest mikefarah/yq release
+      id: yq
+      uses: pozetroninc/github-action-get-latest-release@v0.7.0
+      with:
+        repository: mikefarah/yq
+        excludes: prerelease, draft
     - name: Collect yq info
       id: info
       env:
-        YQ_VERSION: 4.35.2
-        YQ_TEMP_FILE: .data-format-converter-action
+        YQ_TEMP_FILE: ".data-format-converter-action"
       run: |
-        echo "YQ_VERSION=$YQ_VERSION" >> $GITHUB_OUTPUT
         echo "YQ_TEMP_FILE=$YQ_TEMP_FILE" >> $GITHUB_OUTPUT
         YQ_INSTALLED=$(if command -v yq >/dev/null 2>&1; then echo true; else echo false; fi)
         echo "YQ_INSTALLED=$YQ_INSTALLED" >> $GITHUB_OUTPUT
@@ -75,7 +79,7 @@ runs:
       with:
         repository: mikefarah/yq
         latest: false
-        tag: v${{ steps.info.outputs.YQ_VERSION }}
+        tag: ${{ steps.yq.outputs.release }}
         fileName: ${{ steps.info.outputs.YQ_BINARY }}
         tarBall: false
         zipBall: false
@@ -87,11 +91,15 @@ runs:
           chmod +x ${{ steps.info.outputs.YQ_EXEC }}
         fi
         echo "$(pwd)" >> $GITHUB_PATH
-        echo "::debug::${{ steps.info.outputs.YQ_BINARY }}@${{ steps.info.outputs.YQ_VERSION }} has been installed"
+        echo "::debug::${{ steps.info.outputs.YQ_BINARY }}@${{ steps.yq.outputs.release }} has been installed"
       shell: sh
     - name: Convert
       if: ${{ inputs.from != inputs.to }}
-      run: ${{ steps.info.outputs.YQ_EXEC }} -P '${{ inputs.input }}' -p=${{ inputs.from }} -o=${{ inputs.to }} > '${{ steps.info.outputs.YQ_TEMP_FILE }}'
+      env:
+        INPUTS_INPUT: "${{ inputs.input }}"
+        INPUTS_FROM: "${{ inputs.from }}"
+        INPUTS_TO: "${{ inputs.to }}"
+      run: ${{ steps.info.outputs.YQ_EXEC }} -P "$INPUTS_INPUT" -p "$INPUTS_FROM" -o "$INPUTS_TO" > "${{ steps.info.outputs.YQ_TEMP_FILE }}"
       shell: sh
     - name: Save output
       id: result
