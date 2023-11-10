@@ -6,6 +6,10 @@ on: # yamllint disable-line rule:truthy
     branches:
       - "main"
   pull_request:
+    branches:
+      - "main"
+  schedule:
+    - cron: "0 0 * * 1"
 
 jobs:
   convert:
