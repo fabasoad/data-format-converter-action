@@ -11,10 +11,28 @@ on: # yamllint disable-line rule:truthy
   schedule:
     - cron: "0 0 * * 1"
 
+defaults:
+  run:
+    shell: sh
+
 jobs:
+  github-token:
+    name: Get GitHub token
+    timeout-minutes: 3
+    runs-on: ubuntu-latest
+    outputs:
+      value: ${{ steps.generate-app-token.outputs.token }}
+    steps:
+      - name: Generate
+        uses: actions/create-github-app-token@v1
+        id: generate-app-token
+        with:
+          app-id: ${{ vars.APP_ID_READONLY }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY_READONLY }}
   convert:
     name: Convert
     timeout-minutes: 5
+    needs: [github-token]
     strategy:
       fail-fast: false
       matrix:
@@ -23,7 +41,8 @@ jobs:
         to: ["yaml", "json", "xml", "props"]
     runs-on: ${{ matrix.os }}-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v4
       - name: Prepare
         run: |
           echo 's:' > expected.yaml
@@ -48,7 +67,6 @@ jobs:
           echo 's.v = 1' > expected.props
           echo 's.m.0 = t1' >> expected.props
           echo 's.m.1 = t2' >> expected.props
-        shell: sh
       - name: Convert
         uses: ./
         id: convert
@@ -56,26 +74,25 @@ jobs:
           input: expected.${{ matrix.from }}
           from: ${{ matrix.from }}
           to: ${{ matrix.to }}
+          token: ${{ needs.github-token.outputs.value }}
       - name: Save result
         run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
-        shell: sh
       - name: Print actual file
         run: cat actual.${{ matrix.to }}
-        shell: sh
       - name: Validate
         run: cmp -s "expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
-        shell: sh
       - name: Clean up
+        if: ${{ always() }}
         run: |
           rm -f expected.yaml
           rm -f expected.json
           rm -f expected.xml
           rm -f expected.props
           rm -f actual.${{ matrix.to }}
-        shell: sh
   convert-container:
     name: Convert
     timeout-minutes: 5
+    needs: [github-token]
     strategy:
       fail-fast: false
       matrix:
@@ -86,7 +103,8 @@ jobs:
     container:
       image: ${{ matrix.image }}:latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v4
       - name: Prepare
         run: |
           echo 's:' > expected.yaml
@@ -111,7 +129,6 @@ jobs:
           echo 's.v = 1' > expected.props
           echo 's.m.0 = t1' >> expected.props
           echo 's.m.1 = t2' >> expected.props
-        shell: sh
       - name: Convert
         uses: ./
         id: convert
@@ -119,12 +136,11 @@ jobs:
           input: expected.${{ matrix.from }}
           from: ${{ matrix.from }}
           to: ${{ matrix.to }}
+          token: ${{ needs.github-token.outputs.value }}
       - name: Save result
         run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
-        shell: sh
       - name: Print actual file
         run: cat actual.${{ matrix.to }}
-        shell: sh
       - name: Install dependencies
         if: ${{ matrix.image == 'centos' }}
         run: |
@@ -132,15 +148,13 @@ jobs:
           sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
           yum update -y
           yum install diffutils
-        shell: sh
       - name: Validate
         run: cmp -s "expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
-        shell: sh
       - name: Clean up
+        if: ${{ always() }}
         run: |
           rm -f expected.yaml
           rm -f expected.json
           rm -f expected.xml
           rm -f expected.props
           rm -f actual.${{ matrix.to }}
-        shell: sh

@@ -15,6 +15,10 @@ inputs:
   to:
     description: "Format of a file as a result. Possible values: json, xml, yaml, props."
     required: true
+  token:
+    description: "The GitHub token or personal access token"
+    required: false
+    default: ${{ github.token }}
 outputs:
   output:
     description: "Converted data."
@@ -28,6 +32,7 @@ runs:
       with:
         repository: mikefarah/yq
         excludes: prerelease, draft
+        token: ${{ inputs.token }}
     - name: Collect yq info
       id: info
       env:
