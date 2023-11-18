@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 3
     runs-on: ubuntu-latest
     outputs:
-      value: ${{ steps.encode-token.outputs.value }}
+      value: ${{ steps.encrypt-token.outputs.value }}
     steps:
       - name: Generate
         uses: actions/create-github-app-token@v1
@@ -29,11 +29,12 @@ jobs:
         with:
           app-id: ${{ vars.APP_ID_READONLY }}
           private-key: ${{ secrets.APP_PRIVATE_KEY_READONLY }}
-      - name: Encode token
-        id: encode-token
+      - name: Encrypt token
+        id: encrypt-token
         run: |
           token="${{ steps.generate-app-token.outputs.token }}"
-          echo "value=$(echo $token | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
+          token_encrypted=$(gpg --symmetric --batch --passphrase "${{ secrets.PASSPHRASE }}" --output - <(echo "$token") | base64 -w0)
+          echo "value=$token_encrypted" >> $GITHUB_OUTPUT
   convert:
     name: Convert
     timeout-minutes: 5
@@ -76,11 +77,12 @@ jobs:
           echo 's.v = 1' > expected.props
           echo 's.m.0 = t1' >> expected.props
           echo 's.m.1 = t2' >> expected.props
-      - name: Decode token
-        id: decode-token
+      - name: Decrypt token
+        id: decrypt-token
         run: |
-          token="${{ needs.github-token.outputs.value }}"
-          echo "value=$(echo $token | base64 -d | base64 -d)" >> $GITHUB_OUTPUT
+          token=$(gpg --decrypt --quiet --batch --passphrase "${{ secrets.PASSPHRASE }}" --output - <(echo "${{ needs.github-token.outputs.value }}" | base64 --decode))
+          echo "::add-mask::$token"
+          echo "value=$token" >> $GITHUB_OUTPUT
       - name: Convert
         uses: ./
         id: convert
@@ -88,7 +90,7 @@ jobs:
           input: expected.${{ matrix.from }}
           from: ${{ matrix.from }}
           to: ${{ matrix.to }}
-          token: ${{ steps.decode-token.outputs.value }}
+          token: ${{ steps.decrypt-token.outputs.value }}
       - name: Save result
         run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
       - name: Print actual file
@@ -144,11 +146,12 @@ jobs:
           echo 's.v = 1' > expected.props
           echo 's.m.0 = t1' >> expected.props
           echo 's.m.1 = t2' >> expected.props
-      - name: Decode token
-        id: decode-token
+      - name: Decrypt token
+        id: decrypt-token
         run: |
-          token="${{ needs.github-token.outputs.value }}"
-          echo "value=$(echo $token | base64 -d | base64 -d)" >> $GITHUB_OUTPUT
+          token=$(gpg --decrypt --quiet --batch --passphrase "${{ secrets.PASSPHRASE }}" --output - <(echo "${{ needs.github-token.outputs.value }}" | base64 --decode))
+          echo "::add-mask::$token"
+          echo "value=$token" >> $GITHUB_OUTPUT
       - name: Convert
         uses: ./
         id: convert
@@ -156,7 +159,7 @@ jobs:
           input: expected.${{ matrix.from }}
           from: ${{ matrix.from }}
           to: ${{ matrix.to }}
-          token: ${{ steps.decode-token.outputs.value }}
+          token: ${{ steps.decrypt-token.outputs.value }}
       - name: Save result
         run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
       - name: Print actual file
