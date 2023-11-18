@@ -80,7 +80,7 @@ jobs:
         id: decode-token
         run: |
           token="${{ needs.github-token.outputs.value }}"
-          echo "value=$(echo $token | base64 -di | base64 -di)" >> $GITHUB_OUTPUT
+          echo "value=$(echo $token | base64 -d | base64 -d)" >> $GITHUB_OUTPUT
       - name: Convert
         uses: ./
         id: convert
@@ -148,7 +148,7 @@ jobs:
         id: decode-token
         run: |
           token="${{ needs.github-token.outputs.value }}"
-          echo "value=$(echo $token | base64 -di | base64 -di)" >> $GITHUB_OUTPUT
+          echo "value=$(echo $token | base64 -d | base64 -d)" >> $GITHUB_OUTPUT
       - name: Convert
         uses: ./
         id: convert
