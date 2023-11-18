@@ -80,7 +80,7 @@ jobs:
       - name: Decrypt token
         id: decrypt-token
         run: |
-          token=$(gpg --decrypt --quiet --batch --passphrase "${{ secrets.PASSPHRASE }}" --output - <(echo "${{ needs.github-token.outputs.value }}" | base64 --decode))
+          token=$(gpg --decrypt --quiet --batch --passphrase "${{ secrets.PASSPHRASE }}" --output - <(echo "${{ needs.github-token.outputs.value }}" | base64 -d))
           echo "::add-mask::$token"
           echo "value=$token" >> $GITHUB_OUTPUT
       - name: Convert
