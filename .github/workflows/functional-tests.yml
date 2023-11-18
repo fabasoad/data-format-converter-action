@@ -32,9 +32,8 @@ jobs:
       - name: Encrypt token
         id: encrypt-token
         run: |
-          token="${{ steps.generate-app-token.outputs.token }}"
-          token_encrypted=$(gpg --symmetric --batch --passphrase "${{ secrets.PASSPHRASE }}" --output - <(echo "$token") | base64 -w0)
-          echo "value=$token_encrypted" >> $GITHUB_OUTPUT
+          token=$(echo "${{ steps.generate-app-token.outputs.token }}" | openssl aes-256-cbc -a -salt -pass "${{ secrets.PASSPHRASE }}" | base64 -e)
+          echo "value=$token" >> $GITHUB_OUTPUT
   convert:
     name: Convert
     timeout-minutes: 5
@@ -80,7 +79,7 @@ jobs:
       - name: Decrypt token
         id: decrypt-token
         run: |
-          token=$(gpg --decrypt --quiet --batch --passphrase "${{ secrets.PASSPHRASE }}" --output - <(echo "${{ needs.github-token.outputs.value }}" | base64 -d))
+          token=$(echo "${{ needs.github-token.outputs.value }}" | base64 -d | openssl aes-256-cbc -d -a -pass "${{ secrets.PASSPHRASE }}")
           echo "::add-mask::$token"
           echo "value=$token" >> $GITHUB_OUTPUT
       - name: Convert
