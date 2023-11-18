@@ -32,7 +32,7 @@ jobs:
       - name: Encrypt token
         id: encrypt-token
         run: |
-          token=$(echo "${{ steps.generate-app-token.outputs.token }}" | openssl aes-256-cbc -a -salt -pass "${{ secrets.PASSPHRASE }}" | base64 -e)
+          token=$(echo "${{ steps.generate-app-token.outputs.token }}" | openssl enc -base64 -e -aes-256-cbc -salt -pass "${{ secrets.PASSPHRASE }}" -pbkdf2)
           echo "value=$token" >> $GITHUB_OUTPUT
   convert:
     name: Convert
@@ -79,7 +79,7 @@ jobs:
       - name: Decrypt token
         id: decrypt-token
         run: |
-          token=$(echo "${{ needs.github-token.outputs.value }}" | base64 -d | openssl aes-256-cbc -d -a -pass "${{ secrets.PASSPHRASE }}")
+          token=$(echo "${{ needs.github-token.outputs.value }}" | openssl enc -base64 -d -aes-256-cbc -salt -pass "${{ secrets.PASSPHRASE }}" -pbkdf2)
           echo "::add-mask::$token"
           echo "value=$token" >> $GITHUB_OUTPUT
       - name: Convert
@@ -148,7 +148,7 @@ jobs:
       - name: Decrypt token
         id: decrypt-token
         run: |
-          token=$(echo "${{ needs.github-token.outputs.value }}" | base64 -d | openssl aes-256-cbc -d -a -pass "${{ secrets.PASSPHRASE }}")
+          token=$(echo "${{ needs.github-token.outputs.value }}" | openssl enc -base64 -d -aes-256-cbc -salt -pass "${{ secrets.PASSPHRASE }}" -pbkdf2)
           echo "::add-mask::$token"
           echo "value=$token" >> $GITHUB_OUTPUT
       - name: Convert
