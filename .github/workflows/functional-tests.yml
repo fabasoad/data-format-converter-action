@@ -16,9 +16,28 @@ defaults:
     shell: sh
 
 jobs:
+  github-token:
+    name: Get GitHub token
+    timeout-minutes: 3
+    runs-on: ubuntu-latest
+    outputs:
+      value: ${{ steps.encode-token.outputs.value }}
+    steps:
+      - name: Generate
+        uses: actions/create-github-app-token@v1
+        id: generate-app-token
+        with:
+          app-id: ${{ vars.APP_ID_READONLY }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY_READONLY }}
+      - name: Encode token
+        id: encode-token
+        run: |
+          token="${{ steps.generate-app-token.outputs.token }}"
+          echo "value=$(echo $token | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
   convert:
     name: Convert
     timeout-minutes: 5
+    needs: [github-token]
     strategy:
       fail-fast: false
       matrix:
@@ -27,21 +46,17 @@ jobs:
         to: ["yaml", "json", "xml", "props"]
     runs-on: ${{ matrix.os }}-latest
     steps:
-      - name: Generate GitHub token
-        uses: actions/create-github-app-token@v1
-        id: generate-app-token
-        with:
-          app-id: ${{ vars.APP_ID_READONLY }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY_READONLY }}
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v4
       - name: Prepare
         run: |
+          # yaml
           echo 's:' > expected.yaml
           echo '  v: "1"' >> expected.yaml
           echo '  m:' >> expected.yaml
           echo '    - t1' >> expected.yaml
           echo '    - t2' >> expected.yaml
+          # json
           echo '{' > expected.json
           echo '  "s": {' >> expected.json
           echo '    "v": "1",' >> expected.json
@@ -51,14 +66,21 @@ jobs:
           echo '    ]' >> expected.json
           echo '  }' >> expected.json
           echo '}' >> expected.json
+          # xml
           echo '<s>' > expected.xml
           echo '  <v>1</v>' >> expected.xml
           echo '  <m>t1</m>' >> expected.xml
           echo '  <m>t2</m>' >> expected.xml
           echo '</s>' >> expected.xml
+          # props
           echo 's.v = 1' > expected.props
           echo 's.m.0 = t1' >> expected.props
           echo 's.m.1 = t2' >> expected.props
+      - name: Decode token
+        id: decode-token
+        run: |
+          token="${{ needs.github-token.outputs.value }}"
+          echo "value=$(echo $token | base64 -di | base64 -di)" >> $GITHUB_OUTPUT
       - name: Convert
         uses: ./
         id: convert
@@ -66,7 +88,7 @@ jobs:
           input: expected.${{ matrix.from }}
           from: ${{ matrix.from }}
           to: ${{ matrix.to }}
-          token: ${{ steps.generate-app-token.outputs.token }}
+          token: ${{ steps.decode-token.outputs.value }}
       - name: Save result
         run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
       - name: Print actual file
@@ -76,14 +98,12 @@ jobs:
       - name: Clean up
         if: ${{ always() }}
         run: |
-          rm -f expected.yaml
-          rm -f expected.json
-          rm -f expected.xml
-          rm -f expected.props
+          rm -f expected.{json,props,xml,yaml}
           rm -f actual.${{ matrix.to }}
   convert-container:
     name: Convert
     timeout-minutes: 5
+    needs: [github-token]
     strategy:
       fail-fast: false
       matrix:
@@ -94,21 +114,17 @@ jobs:
     container:
       image: ${{ matrix.image }}:latest
     steps:
-      - name: Generate GitHub token
-        uses: actions/create-github-app-token@v1
-        id: generate-app-token
-        with:
-          app-id: ${{ vars.APP_ID_READONLY }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY_READONLY }}
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v4
       - name: Prepare
         run: |
+          # yaml
           echo 's:' > expected.yaml
           echo '  v: "1"' >> expected.yaml
           echo '  m:' >> expected.yaml
           echo '    - t1' >> expected.yaml
           echo '    - t2' >> expected.yaml
+          # json
           echo '{' > expected.json
           echo '  "s": {' >> expected.json
           echo '    "v": "1",' >> expected.json
@@ -118,14 +134,21 @@ jobs:
           echo '    ]' >> expected.json
           echo '  }' >> expected.json
           echo '}' >> expected.json
+          # xml
           echo '<s>' > expected.xml
           echo '  <v>1</v>' >> expected.xml
           echo '  <m>t1</m>' >> expected.xml
           echo '  <m>t2</m>' >> expected.xml
           echo '</s>' >> expected.xml
+          # props
           echo 's.v = 1' > expected.props
           echo 's.m.0 = t1' >> expected.props
           echo 's.m.1 = t2' >> expected.props
+      - name: Decode token
+        id: decode-token
+        run: |
+          token="${{ needs.github-token.outputs.value }}"
+          echo "value=$(echo $token | base64 -di | base64 -di)" >> $GITHUB_OUTPUT
       - name: Convert
         uses: ./
         id: convert
@@ -133,7 +156,7 @@ jobs:
           input: expected.${{ matrix.from }}
           from: ${{ matrix.from }}
           to: ${{ matrix.to }}
-          token: ${{ steps.generate-app-token.outputs.token }}
+          token: ${{ steps.decode-token.outputs.value }}
       - name: Save result
         run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
       - name: Print actual file
@@ -150,8 +173,5 @@ jobs:
       - name: Clean up
         if: ${{ always() }}
         run: |
-          rm -f expected.yaml
-          rm -f expected.json
-          rm -f expected.xml
-          rm -f expected.props
+          rm -f expected.{json,props,xml,yaml}
           rm -f actual.${{ matrix.to }}
