@@ -16,23 +16,9 @@ defaults:
     shell: sh
 
 jobs:
-  github-token:
-    name: Get GitHub token
-    timeout-minutes: 3
-    runs-on: ubuntu-latest
-    outputs:
-      value: ${{ steps.generate-app-token.outputs.token }}
-    steps:
-      - name: Generate
-        uses: actions/create-github-app-token@v1
-        id: generate-app-token
-        with:
-          app-id: ${{ vars.APP_ID_READONLY }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY_READONLY }}
   convert:
     name: Convert
     timeout-minutes: 5
-    needs: [github-token]
     strategy:
       fail-fast: false
       matrix:
@@ -41,6 +27,12 @@ jobs:
         to: ["yaml", "json", "xml", "props"]
     runs-on: ${{ matrix.os }}-latest
     steps:
+      - name: Generate GitHub token
+        uses: actions/create-github-app-token@v1
+        id: generate-app-token
+        with:
+          app-id: ${{ vars.APP_ID_READONLY }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY_READONLY }}
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v4
       - name: Prepare
@@ -74,7 +66,7 @@ jobs:
           input: expected.${{ matrix.from }}
           from: ${{ matrix.from }}
           to: ${{ matrix.to }}
-          token: ${{ needs.github-token.outputs.value }}
+          token: ${{ steps.generate-app-token.outputs.token }}
       - name: Save result
         run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
       - name: Print actual file
@@ -92,7 +84,6 @@ jobs:
   convert-container:
     name: Convert
     timeout-minutes: 5
-    needs: [github-token]
     strategy:
       fail-fast: false
       matrix:
@@ -103,6 +94,12 @@ jobs:
     container:
       image: ${{ matrix.image }}:latest
     steps:
+      - name: Generate GitHub token
+        uses: actions/create-github-app-token@v1
+        id: generate-app-token
+        with:
+          app-id: ${{ vars.APP_ID_READONLY }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY_READONLY }}
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v4
       - name: Prepare
@@ -136,7 +133,7 @@ jobs:
           input: expected.${{ matrix.from }}
           from: ${{ matrix.from }}
           to: ${{ matrix.to }}
-          token: ${{ needs.github-token.outputs.value }}
+          token: ${{ steps.generate-app-token.outputs.token }}
       - name: Save result
         run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
       - name: Print actual file
