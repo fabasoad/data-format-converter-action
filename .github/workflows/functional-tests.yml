@@ -36,7 +36,7 @@ jobs:
         run: |
           import os, base64
           from cryptography.fernet import Fernet
-          fernet = Fernet(base64.urlsafe_b64encode(b'${{ secrets.PASSPHRASE }}'))
+          fernet = Fernet(base64.urlsafe_b64encode('${{ secrets.PASSPHRASE }}'.encode('utf-8')))
           encrypted_token = fernet.encrypt('${{ steps.readonly-token.outputs.token }}'.encode())
           with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
             print('value={0}'.format(encrypted_token), file=fh)
@@ -90,7 +90,7 @@ jobs:
         run: |
           import os, base64
           from cryptography.fernet import Fernet
-          fernet = Fernet(base64.urlsafe_b64encode(b'${{ secrets.PASSPHRASE }}'))
+          fernet = Fernet(base64.urlsafe_b64encode('${{ secrets.PASSPHRASE }}'.encode('utf-8')))
           decrypted_token = fernet.decrypt('${{ needs.github-token.outputs.value }}').decode()
           print(f'::add-mask::{decrypted_token}')
           with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
@@ -166,7 +166,7 @@ jobs:
         run: |
           import os, base64
           from cryptography.fernet import Fernet
-          fernet = Fernet(base64.urlsafe_b64encode(b'${{ secrets.PASSPHRASE }}'))
+          fernet = Fernet(base64.urlsafe_b64encode('${{ secrets.PASSPHRASE }}'.encode('utf-8')))
           decrypted_token = fernet.decrypt('${{ needs.github-token.outputs.value }}').decode()
           print(f'::add-mask::{decrypted_token}')
           with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
