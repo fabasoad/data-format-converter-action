@@ -37,7 +37,7 @@ jobs:
           import os
           from cryptography.fernet import Fernet
           fernet = Fernet('${{ secrets.PASSPHRASE }}'.encode('utf-8'))
-          encrypted_token = fernet.encrypt('${{ steps.readonly-token.outputs.token }}'.encode())
+          encrypted_token = fernet.encrypt('${{ steps.readonly-token.outputs.token }}'.encode()).decode('utf-8')
           with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
             print('value={0}'.format(encrypted_token), file=fh)
         shell: python
@@ -91,7 +91,7 @@ jobs:
           import os
           from cryptography.fernet import Fernet
           fernet = Fernet('${{ secrets.PASSPHRASE }}'.encode('utf-8'))
-          decrypted_token = fernet.decrypt('${{ needs.github-token.outputs.value }}').decode()
+          decrypted_token = fernet.decrypt('${{ needs.github-token.outputs.value }}'.encode('utf-8')).decode()
           print(f'::add-mask::{decrypted_token}')
           with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
             print('value={0}'.format(decrypted_token), file=fh)
@@ -125,10 +125,24 @@ jobs:
         image: ["alpine", "centos"]
         from: ["yaml", "json", "xml", "props"]
         to: ["yaml", "json", "xml", "props"]
+        include:
+          - image: alpine
+            setup-command: |
+              apk add py3-pip
+              pip install cryptography
+          - image: centos
+            setup-command: |
+              sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
+              sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
+              yum update -y
+              yum install diffutils epel-release python-pip
+              pip install cryptography
     runs-on: ubuntu-latest
     container:
       image: ${{ matrix.image }}:latest
     steps:
+      - name: Setup
+        run: ${{ matrix.setup-command }}
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v4
       - name: Prepare
@@ -159,15 +173,13 @@ jobs:
           echo 's.v = 1' > expected.props
           echo 's.m.0 = t1' >> expected.props
           echo 's.m.1 = t2' >> expected.props
-      - name: Install dependencies
-        run: pip install cryptography
       - name: Decrypt token
         id: decrypt-token
         run: |
           import os
           from cryptography.fernet import Fernet
           fernet = Fernet('${{ secrets.PASSPHRASE }}'.encode('utf-8'))
-          decrypted_token = fernet.decrypt('${{ needs.github-token.outputs.value }}').decode()
+          decrypted_token = fernet.decrypt('${{ needs.github-token.outputs.value }}'.encode('utf-8')).decode()
           print(f'::add-mask::{decrypted_token}')
           with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
             print('value={0}'.format(decrypted_token), file=fh)
@@ -184,13 +196,6 @@ jobs:
         run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
       - name: Print actual file
         run: cat actual.${{ matrix.to }}
-      - name: Install dependencies
-        if: ${{ matrix.image == 'centos' }}
-        run: |
-          sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
-          sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
-          yum update -y
-          yum install diffutils
       - name: Validate
         run: cmp -s "expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
       - name: Clean up
