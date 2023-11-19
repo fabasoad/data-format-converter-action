@@ -34,7 +34,7 @@ jobs:
       - name: Encrypt token
         id: encrypt-token
         run: |
-          import os
+          import os, base64
           from cryptography.fernet import Fernet
           fernet = Fernet(base64.urlsafe_b64encode(b'${{ secrets.PASSPHRASE }}'))
           encrypted_token = fernet.encrypt('${{ steps.readonly-token.outputs.token }}'.encode())
@@ -88,7 +88,7 @@ jobs:
       - name: Decrypt token
         id: decrypt-token
         run: |
-          import os
+          import os, base64
           from cryptography.fernet import Fernet
           fernet = Fernet(base64.urlsafe_b64encode(b'${{ secrets.PASSPHRASE }}'))
           decrypted_token = fernet.decrypt('${{ needs.github-token.outputs.value }}').decode()
@@ -164,7 +164,7 @@ jobs:
       - name: Decrypt token
         id: decrypt-token
         run: |
-          import os
+          import os, base64
           from cryptography.fernet import Fernet
           fernet = Fernet(base64.urlsafe_b64encode(b'${{ secrets.PASSPHRASE }}'))
           decrypted_token = fernet.decrypt('${{ needs.github-token.outputs.value }}').decode()
