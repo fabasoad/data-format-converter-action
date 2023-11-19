@@ -23,17 +23,24 @@ jobs:
     outputs:
       value: ${{ steps.encrypt-token.outputs.value }}
     steps:
-      - name: Generate
+      - name: Generate readonly token
         uses: actions/create-github-app-token@v1
-        id: generate-app-token
+        id: readonly-token
         with:
           app-id: ${{ vars.APP_ID_READONLY }}
           private-key: ${{ secrets.APP_PRIVATE_KEY_READONLY }}
+      - name: Install dependencies
+        run: pip install cryptography
       - name: Encrypt token
         id: encrypt-token
         run: |
-          token=$(echo "${{ steps.generate-app-token.outputs.token }}" | openssl enc -base64 -e -aes-256-cbc -salt -pass "${{ secrets.PASSPHRASE }}" -pbkdf2)
-          echo "value=$token" >> $GITHUB_OUTPUT
+          import os
+          from cryptography.fernet import Fernet
+          fernet = Fernet('${{ secrets.PASSPHRASE }}')
+          encrypted_token = fernet.encrypt('${{ steps.readonly-token.outputs.token }}'.encode())
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
+            print('value={0}'.format(encrypted_token), file=fh)
+        shell: python
   convert:
     name: Convert
     timeout-minutes: 5
@@ -76,12 +83,19 @@ jobs:
           echo 's.v = 1' > expected.props
           echo 's.m.0 = t1' >> expected.props
           echo 's.m.1 = t2' >> expected.props
+      - name: Install dependencies
+        run: pip install cryptography
       - name: Decrypt token
         id: decrypt-token
         run: |
-          token=$(echo "${{ needs.github-token.outputs.value }}" | openssl enc -base64 -d -aes-256-cbc -salt -pass "${{ secrets.PASSPHRASE }}" -pbkdf2)
-          echo "::add-mask::$token"
-          echo "value=$token" >> $GITHUB_OUTPUT
+          import os
+          from cryptography.fernet import Fernet
+          fernet = Fernet('${{ secrets.PASSPHRASE }}')
+          decrypted_token = fernet.decrypt('${{ needs.github-token.outputs.value }}').decode()
+          print(f'::add-mask::{decrypted_token}')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
+            print('value={0}'.format(decrypted_token), file=fh)
+        shell: python
       - name: Convert
         uses: ./
         id: convert
@@ -145,12 +159,19 @@ jobs:
           echo 's.v = 1' > expected.props
           echo 's.m.0 = t1' >> expected.props
           echo 's.m.1 = t2' >> expected.props
+      - name: Install dependencies
+        run: pip install cryptography
       - name: Decrypt token
         id: decrypt-token
         run: |
-          token=$(echo "${{ needs.github-token.outputs.value }}" | openssl enc -base64 -d -aes-256-cbc -salt -pass "${{ secrets.PASSPHRASE }}" -pbkdf2)
-          echo "::add-mask::$token"
-          echo "value=$token" >> $GITHUB_OUTPUT
+          import os
+          from cryptography.fernet import Fernet
+          fernet = Fernet('${{ secrets.PASSPHRASE }}')
+          decrypted_token = fernet.decrypt('${{ needs.github-token.outputs.value }}').decode()
+          print(f'::add-mask::{decrypted_token}')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
+            print('value={0}'.format(decrypted_token), file=fh)
+        shell: python
       - name: Convert
         uses: ./
         id: convert
