@@ -29,6 +29,7 @@ jobs:
         with:
           app-id: ${{ vars.APP_ID_READONLY }}
           private-key: ${{ secrets.APP_PRIVATE_KEY_READONLY }}
+          skip-token-revoke: true
       - name: Install dependencies
         run: pip install cryptography
       - name: Encrypt token
@@ -38,7 +39,6 @@ jobs:
           from cryptography.fernet import Fernet
           fernet = Fernet('${{ secrets.PASSPHRASE }}'.encode('utf-8'))
           encrypted_token = fernet.encrypt('${{ steps.readonly-token.outputs.token }}'.encode()).decode('utf-8')
-          print('~~~~ 1: {0}'.format(encrypted_token))
           with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
             print('value={0}'.format(encrypted_token), file=fh)
         shell: python
@@ -92,10 +92,7 @@ jobs:
           import os
           from cryptography.fernet import Fernet
           fernet = Fernet('${{ secrets.PASSPHRASE }}'.encode('utf-8'))
-          print('~~~~ 2: {0}'.format('${{ needs.github-token.outputs.value }}'))
-          print('~~~~ 3: {0}'.format('${{ needs.github-token.outputs.value }}'.encode('utf-8')))
           decrypted_token = fernet.decrypt('${{ needs.github-token.outputs.value }}'.encode('utf-8')).decode()
-          print('~~~~ 4: {0}'.format(decrypted_token))
           print(f'::add-mask::{decrypted_token}')
           with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
             print('value={0}'.format(decrypted_token), file=fh)
@@ -136,10 +133,14 @@ jobs:
               pip install cryptography
           - image: centos
             setup-command: |
+              # cmp
               sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
               sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
               yum update -y
-              yum install diffutils epel-release python-pip
+              yum install diffutils
+              # pip
+              yum install epel-release
+              yum install python-pip
               pip install cryptography
     runs-on: ubuntu-latest
     container:
