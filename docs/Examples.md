@@ -106,7 +106,6 @@ person:
 
 ```yaml
 - uses: fabasoad/data-format-converter-action@v0
-  id: xml2yaml
   with:
     input: "person.xml"
     from: "xml"
@@ -133,7 +132,6 @@ person:
     app-id: ${{ vars.APP_ID }}
     private-key: ${{ secrets.APP_PRIVATE_KEY }}
 - uses: fabasoad/data-format-converter-action@v0
-  id: xml2yaml
   with:
     input: "person.xml"
     from: "xml"

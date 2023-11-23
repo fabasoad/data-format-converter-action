@@ -16,23 +16,9 @@ defaults:
     shell: sh
 
 jobs:
-  github-token:
-    name: Get GitHub token
-    timeout-minutes: 3
-    runs-on: ubuntu-latest
-    outputs:
-      value: ${{ steps.generate-app-token.outputs.token }}
-    steps:
-      - name: Generate
-        uses: actions/create-github-app-token@v1
-        id: generate-app-token
-        with:
-          app-id: ${{ vars.APP_ID_READONLY }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY_READONLY }}
   convert:
     name: Convert
     timeout-minutes: 5
-    needs: [github-token]
     strategy:
       fail-fast: false
       matrix:
@@ -45,11 +31,13 @@ jobs:
         uses: actions/checkout@v4
       - name: Prepare
         run: |
+          # yaml
           echo 's:' > expected.yaml
           echo '  v: "1"' >> expected.yaml
           echo '  m:' >> expected.yaml
           echo '    - t1' >> expected.yaml
           echo '    - t2' >> expected.yaml
+          # json
           echo '{' > expected.json
           echo '  "s": {' >> expected.json
           echo '    "v": "1",' >> expected.json
@@ -59,11 +47,13 @@ jobs:
           echo '    ]' >> expected.json
           echo '  }' >> expected.json
           echo '}' >> expected.json
+          # xml
           echo '<s>' > expected.xml
           echo '  <v>1</v>' >> expected.xml
           echo '  <m>t1</m>' >> expected.xml
           echo '  <m>t2</m>' >> expected.xml
           echo '</s>' >> expected.xml
+          # props
           echo 's.v = 1' > expected.props
           echo 's.m.0 = t1' >> expected.props
           echo 's.m.1 = t2' >> expected.props
@@ -74,7 +64,7 @@ jobs:
           input: expected.${{ matrix.from }}
           from: ${{ matrix.from }}
           to: ${{ matrix.to }}
-          token: ${{ needs.github-token.outputs.value }}
+          token: ${{ secrets.PAT_GITHUB }}
       - name: Save result
         run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
       - name: Print actual file
@@ -84,34 +74,45 @@ jobs:
       - name: Clean up
         if: ${{ always() }}
         run: |
-          rm -f expected.yaml
-          rm -f expected.json
-          rm -f expected.xml
-          rm -f expected.props
+          rm -f expected.{json,props,xml,yaml}
           rm -f actual.${{ matrix.to }}
   convert-container:
     name: Convert
     timeout-minutes: 5
-    needs: [github-token]
     strategy:
       fail-fast: false
       matrix:
         image: ["alpine", "centos"]
         from: ["yaml", "json", "xml", "props"]
         to: ["yaml", "json", "xml", "props"]
+        include:
+          - image: alpine
+            setup-command: ""
+          - image: centos
+            setup-command: |
+              sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
+              sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
+              yum update -y
+              # cmp
+              yum install -y diffutils
     runs-on: ubuntu-latest
     container:
       image: ${{ matrix.image }}:latest
     steps:
+      - name: Setup
+        if: ${{ matrix.setup-command != '' }}
+        run: ${{ matrix.setup-command }}
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v4
       - name: Prepare
         run: |
+          # yaml
           echo 's:' > expected.yaml
           echo '  v: "1"' >> expected.yaml
           echo '  m:' >> expected.yaml
           echo '    - t1' >> expected.yaml
           echo '    - t2' >> expected.yaml
+          # json
           echo '{' > expected.json
           echo '  "s": {' >> expected.json
           echo '    "v": "1",' >> expected.json
@@ -121,11 +122,13 @@ jobs:
           echo '    ]' >> expected.json
           echo '  }' >> expected.json
           echo '}' >> expected.json
+          # xml
           echo '<s>' > expected.xml
           echo '  <v>1</v>' >> expected.xml
           echo '  <m>t1</m>' >> expected.xml
           echo '  <m>t2</m>' >> expected.xml
           echo '</s>' >> expected.xml
+          # props
           echo 's.v = 1' > expected.props
           echo 's.m.0 = t1' >> expected.props
           echo 's.m.1 = t2' >> expected.props
@@ -136,25 +139,15 @@ jobs:
           input: expected.${{ matrix.from }}
           from: ${{ matrix.from }}
           to: ${{ matrix.to }}
-          token: ${{ needs.github-token.outputs.value }}
+          token: ${{ secrets.PAT_GITHUB }}
       - name: Save result
         run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
       - name: Print actual file
         run: cat actual.${{ matrix.to }}
-      - name: Install dependencies
-        if: ${{ matrix.image == 'centos' }}
-        run: |
-          sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
-          sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
-          yum update -y
-          yum install diffutils
       - name: Validate
         run: cmp -s "expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
       - name: Clean up
         if: ${{ always() }}
         run: |
-          rm -f expected.yaml
-          rm -f expected.json
-          rm -f expected.xml
-          rm -f expected.props
+          rm -f expected.{json,props,xml,yaml}
           rm -f actual.${{ matrix.to }}
