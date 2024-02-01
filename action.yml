@@ -80,7 +80,7 @@ runs:
       shell: sh
     - name: Download mikefarah/yq
       if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' }}
-      uses: robinraju/release-downloader@v1.8
+      uses: robinraju/release-downloader@v1.9
       with:
         repository: mikefarah/yq
         latest: false
