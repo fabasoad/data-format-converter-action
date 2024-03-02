@@ -1,7 +1,6 @@
 ---
 default_install_hook_types: ["pre-commit", "pre-push"]
 default_stages: ["commit", "push"]
-exclude: ^\.gitleaks\.toml$
 minimum_pre_commit_version: 2.18.0
 repos:
   # Security
@@ -10,24 +9,24 @@ repos:
     hooks:
       - id: detect-secrets
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.18.1
+    rev: v8.18.2
     hooks:
       - id: gitleaks
   # Markdown
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.38.0
+    rev: v0.39.0
     hooks:
       - id: markdownlint-fix
         stages: ["commit"]
   # Yaml
   - repo: https://github.com/adrienverge/yamllint
-    rev: v1.33.0
+    rev: v1.35.1
     hooks:
       - id: yamllint
         stages: ["push"]
   # GitHub Actions
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.6.26
+    rev: v1.6.27
     hooks:
       - id: actionlint
         args: ["-pyflakes="]

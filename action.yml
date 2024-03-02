@@ -41,34 +41,34 @@ runs:
         echo "YQ_TEMP_FILE=$YQ_TEMP_FILE" >> $GITHUB_OUTPUT
         YQ_INSTALLED=$(if command -v yq >/dev/null 2>&1; then echo true; else echo false; fi)
         echo "YQ_INSTALLED=$YQ_INSTALLED" >> $GITHUB_OUTPUT
-        if [ "${{ runner.os }}" = "macOS" ]; then
-          if [ "${{ runner.arch }}" = "ARM64" ]; then
+        if [ "${RUNNER_OS}" = "macOS" ]; then
+          if [ "${RUNNER_ARCH}" = "ARM64" ]; then
             YQ_BINARY=yq_darwin_arm64
           else
             YQ_BINARY=yq_darwin_amd64
           fi
-        elif [ "${{ runner.os }}" = "Windows" ]; then
-          if [ "${{ runner.arch }}" = "X86" ]; then
+        elif [ "${RUNNER_OS}" = "Windows" ]; then
+          if [ "${RUNNER_ARCH}" = "X86" ]; then
             YQ_BINARY=yq_windows_386.exe
           else
             YQ_BINARY=yq_windows_amd64.exe
           fi
-        elif [ "${{ runner.os }}" = "Linux" ]; then
-          if [ "${{ runner.arch }}" = "X86" ]; then
+        elif [ "${RUNNER_OS}" = "Linux" ]; then
+          if [ "${RUNNER_ARCH}" = "X86" ]; then
             YQ_BINARY=yq_linux_386
-          elif [ "${{ runner.arch }}" = "ARM" ]; then
+          elif [ "${RUNNER_ARCH}" = "ARM" ]; then
             YQ_BINARY=yq_linux_arm
-          elif [ "${{ runner.arch }}" = "ARM64" ]; then
+          elif [ "${RUNNER_ARCH}" = "ARM64" ]; then
             YQ_BINARY=yq_linux_arm64
           else
             YQ_BINARY=yq_linux_amd64
           fi
         else
-          echo "::error file=action.yml,line=44,col=11,endColumn=11::${{ runner.os }} is not supported"
+          echo "::error file=action.yml,line=44,col=11,endColumn=11::${RUNNER_OS} is not supported"
           exit 1
         fi
         echo "YQ_BINARY=$YQ_BINARY" >> $GITHUB_OUTPUT
-        if [ "${{ runner.os }}" = "Windows" ]; then
+        if [ "${RUNNER_OS}" = "Windows" ]; then
           echo "YQ_EXEC=yq.exe" >> $GITHUB_OUTPUT
         else
           echo "YQ_EXEC=yq" >> $GITHUB_OUTPUT
@@ -76,11 +76,13 @@ runs:
       shell: sh
     - name: Check same from and to
       if: ${{ inputs.from == inputs.to }}
-      run: cp "${{ inputs.input }}" "${{ steps.info.outputs.YQ_TEMP_FILE }}"
+      env:
+        INPUT_INPUT: "${{ inputs.input }}"
+      run: cp "${INPUT_INPUT}" "${{ steps.info.outputs.YQ_TEMP_FILE }}"
       shell: sh
     - name: Download mikefarah/yq
       if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' }}
-      uses: robinraju/release-downloader@v1.8
+      uses: robinraju/release-downloader@v1.9
       with:
         repository: mikefarah/yq
         latest: false
@@ -92,7 +94,7 @@ runs:
       if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' }}
       run: |
         mv ${{ steps.info.outputs.YQ_BINARY }} ${{ steps.info.outputs.YQ_EXEC }}
-        if [ "${{ runner.os }}" != "Windows" ]; then
+        if [ "${RUNNER_OS}" != "Windows" ]; then
           chmod +x ${{ steps.info.outputs.YQ_EXEC }}
         fi
         echo "$(pwd)" >> $GITHUB_PATH
