@@ -22,97 +22,106 @@ inputs:
 outputs:
   output:
     description: "Converted data."
-    value: ${{ steps.result.outputs.data }}
+    value: ${{ steps.yq.outputs.result }}
 runs:
   using: "composite"
   steps:
-    - name: Get latest mikefarah/yq release
-      id: yq
-      uses: pozetroninc/github-action-get-latest-release@v0.7.0
-      with:
-        repository: mikefarah/yq
-        excludes: prerelease, draft
-        token: ${{ inputs.token }}
-    - name: Collect yq info
-      id: info
-      env:
-        YQ_TEMP_FILE: ".data-format-converter-action"
-      run: |
-        echo "YQ_TEMP_FILE=$YQ_TEMP_FILE" >> $GITHUB_OUTPUT
-        YQ_INSTALLED=$(if command -v yq >/dev/null 2>&1; then echo true; else echo false; fi)
-        echo "YQ_INSTALLED=$YQ_INSTALLED" >> $GITHUB_OUTPUT
-        if [ "${RUNNER_OS}" = "macOS" ]; then
-          if [ "${RUNNER_ARCH}" = "ARM64" ]; then
-            YQ_BINARY=yq_darwin_arm64
-          else
-            YQ_BINARY=yq_darwin_amd64
-          fi
-        elif [ "${RUNNER_OS}" = "Windows" ]; then
-          if [ "${RUNNER_ARCH}" = "X86" ]; then
-            YQ_BINARY=yq_windows_386.exe
-          else
-            YQ_BINARY=yq_windows_amd64.exe
-          fi
-        elif [ "${RUNNER_OS}" = "Linux" ]; then
-          if [ "${RUNNER_ARCH}" = "X86" ]; then
-            YQ_BINARY=yq_linux_386
-          elif [ "${RUNNER_ARCH}" = "ARM" ]; then
-            YQ_BINARY=yq_linux_arm
-          elif [ "${RUNNER_ARCH}" = "ARM64" ]; then
-            YQ_BINARY=yq_linux_arm64
-          else
-            YQ_BINARY=yq_linux_amd64
-          fi
-        else
-          echo "::error file=action.yml,line=44,col=11,endColumn=11::${RUNNER_OS} is not supported"
-          exit 1
-        fi
-        echo "YQ_BINARY=$YQ_BINARY" >> $GITHUB_OUTPUT
-        if [ "${RUNNER_OS}" = "Windows" ]; then
-          echo "YQ_EXEC=yq.exe" >> $GITHUB_OUTPUT
-        else
-          echo "YQ_EXEC=yq" >> $GITHUB_OUTPUT
-        fi
-      shell: sh
-    - name: Check same from and to
-      if: ${{ inputs.from == inputs.to }}
-      env:
-        INPUT_INPUT: "${{ inputs.input }}"
-      run: cp "${INPUT_INPUT}" "${{ steps.info.outputs.YQ_TEMP_FILE }}"
-      shell: sh
-    - name: Download mikefarah/yq
-      if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' }}
-      uses: robinraju/release-downloader@v1.9
-      with:
-        repository: mikefarah/yq
-        latest: false
-        tag: ${{ steps.yq.outputs.release }}
-        fileName: ${{ steps.info.outputs.YQ_BINARY }}
-        tarBall: false
-        zipBall: false
-    - name: Install mikefarah/yq
-      if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' }}
-      run: |
-        mv ${{ steps.info.outputs.YQ_BINARY }} ${{ steps.info.outputs.YQ_EXEC }}
-        if [ "${RUNNER_OS}" != "Windows" ]; then
-          chmod +x ${{ steps.info.outputs.YQ_EXEC }}
-        fi
-        echo "$(pwd)" >> $GITHUB_PATH
-        echo "::debug::${{ steps.info.outputs.YQ_BINARY }}@${{ steps.yq.outputs.release }} has been installed"
-      shell: sh
     - name: Convert
-      if: ${{ inputs.from != inputs.to }}
+      id: yq
+      uses: mikefarah/yq@v4
       env:
         INPUTS_INPUT: "${{ inputs.input }}"
         INPUTS_FROM: "${{ inputs.from }}"
         INPUTS_TO: "${{ inputs.to }}"
-      run: ${{ steps.info.outputs.YQ_EXEC }} -P "$INPUTS_INPUT" -p "$INPUTS_FROM" -o "$INPUTS_TO" > "${{ steps.info.outputs.YQ_TEMP_FILE }}"
-      shell: sh
-    - name: Save output
-      id: result
-      uses: actions/github-script@v7
       with:
-        script: |
-          const fs = require('fs');
-          core.setOutput('data', fs.readFileSync('${{ steps.info.outputs.YQ_TEMP_FILE }}', 'utf-8').replace(/\s+$/gm, ''));
-          fs.unlinkSync('${{ steps.info.outputs.YQ_TEMP_FILE }}');
+        cmd: yq -P "$INPUTS_INPUT" -p "$INPUTS_FROM" -o "$INPUTS_TO"
+#    - name: Get latest mikefarah/yq release
+#      id: yq
+#      uses: pozetroninc/github-action-get-latest-release@v0.7.0
+#      with:
+#        repository: mikefarah/yq
+#        excludes: prerelease, draft
+#        token: ${{ inputs.token }}
+#    - name: Collect yq info
+#      id: info
+#      env:
+#        YQ_TEMP_FILE: ".data-format-converter-action"
+#      run: |
+#        echo "YQ_TEMP_FILE=$YQ_TEMP_FILE" >> $GITHUB_OUTPUT
+#        YQ_INSTALLED=$(if command -v yq >/dev/null 2>&1; then echo true; else echo false; fi)
+#        echo "YQ_INSTALLED=$YQ_INSTALLED" >> $GITHUB_OUTPUT
+#        if [ "${RUNNER_OS}" = "macOS" ]; then
+#          if [ "${RUNNER_ARCH}" = "ARM64" ]; then
+#            YQ_BINARY=yq_darwin_arm64
+#          else
+#            YQ_BINARY=yq_darwin_amd64
+#          fi
+#        elif [ "${RUNNER_OS}" = "Windows" ]; then
+#          if [ "${RUNNER_ARCH}" = "X86" ]; then
+#            YQ_BINARY=yq_windows_386.exe
+#          else
+#            YQ_BINARY=yq_windows_amd64.exe
+#          fi
+#        elif [ "${RUNNER_OS}" = "Linux" ]; then
+#          if [ "${RUNNER_ARCH}" = "X86" ]; then
+#            YQ_BINARY=yq_linux_386
+#          elif [ "${RUNNER_ARCH}" = "ARM" ]; then
+#            YQ_BINARY=yq_linux_arm
+#          elif [ "${RUNNER_ARCH}" = "ARM64" ]; then
+#            YQ_BINARY=yq_linux_arm64
+#          else
+#            YQ_BINARY=yq_linux_amd64
+#          fi
+#        else
+#          echo "::error file=action.yml,line=44,col=11,endColumn=11::${RUNNER_OS} is not supported"
+#          exit 1
+#        fi
+#        echo "YQ_BINARY=$YQ_BINARY" >> $GITHUB_OUTPUT
+#        if [ "${RUNNER_OS}" = "Windows" ]; then
+#          echo "YQ_EXEC=yq.exe" >> $GITHUB_OUTPUT
+#        else
+#          echo "YQ_EXEC=yq" >> $GITHUB_OUTPUT
+#        fi
+#      shell: sh
+#    - name: Check same from and to
+#      if: ${{ inputs.from == inputs.to }}
+#      env:
+#        INPUT_INPUT: "${{ inputs.input }}"
+#      run: cp "${INPUT_INPUT}" "${{ steps.info.outputs.YQ_TEMP_FILE }}"
+#      shell: sh
+#    - name: Download mikefarah/yq
+#      if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' }}
+#      uses: robinraju/release-downloader@v1.9
+#      with:
+#        repository: mikefarah/yq
+#        latest: false
+#        tag: ${{ steps.yq.outputs.release }}
+#        fileName: ${{ steps.info.outputs.YQ_BINARY }}
+#        tarBall: false
+#        zipBall: false
+#    - name: Install mikefarah/yq
+#      if: ${{ inputs.from != inputs.to && steps.info.outputs.YQ_INSTALLED == 'false' }}
+#      run: |
+#        mv ${{ steps.info.outputs.YQ_BINARY }} ${{ steps.info.outputs.YQ_EXEC }}
+#        if [ "${RUNNER_OS}" != "Windows" ]; then
+#          chmod +x ${{ steps.info.outputs.YQ_EXEC }}
+#        fi
+#        echo "$(pwd)" >> $GITHUB_PATH
+#        echo "::debug::${{ steps.info.outputs.YQ_BINARY }}@${{ steps.yq.outputs.release }} has been installed"
+#      shell: sh
+#    - name: Convert
+#      if: ${{ inputs.from != inputs.to }}
+#      env:
+#        INPUTS_INPUT: "${{ inputs.input }}"
+#        INPUTS_FROM: "${{ inputs.from }}"
+#        INPUTS_TO: "${{ inputs.to }}"
+#      run: ${{ steps.info.outputs.YQ_EXEC }} -P "$INPUTS_INPUT" -p "$INPUTS_FROM" -o "$INPUTS_TO" > "${{ steps.info.outputs.YQ_TEMP_FILE }}"
+#      shell: sh
+#    - name: Save output
+#      id: result
+#      uses: actions/github-script@v7
+#      with:
+#        script: |
+#          const fs = require('fs');
+#          core.setOutput('data', fs.readFileSync('${{ steps.info.outputs.YQ_TEMP_FILE }}', 'utf-8').replace(/\s+$/gm, ''));
+#          fs.unlinkSync('${{ steps.info.outputs.YQ_TEMP_FILE }}');
