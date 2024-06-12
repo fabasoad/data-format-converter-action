@@ -96,7 +96,10 @@ person:
 
 ## 3. Use GitHub token
 
-### 3.1. Personal access token (PAT)
+There are 2 options on how you can use GitHub token - PAT and GitHub app token.
+You can select any of these options based on your needs.
+
+### Option 1: Personal access token (PAT)
 
 1. [Create PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic)
    with `repo` permission.
@@ -113,7 +116,7 @@ person:
     token: ${{ secrets.MY_GITHUB_TOKEN }}
 ```
 
-### 3.2. GitHub App token
+### Option 2: GitHub App token
 
 1. [Register a GitHub App](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app)
    with `contents: read` permission.
