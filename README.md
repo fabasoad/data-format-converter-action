@@ -11,14 +11,19 @@ Converts data formats interchangeably. The following formats are supported: [XML
 
 ## Inputs
 
-<!-- prettier-ignore-start -->
-| Name  | Required | Description                               | Possible values                |
-|-------|----------|-------------------------------------------|--------------------------------|
-| input | Yes      | Path to the file to be converted          | _&lt;Path&gt;_                 |
-| from  | Yes      | Format of a data in `input` file          | `json`, `xml`, `yaml`, `props` |
-| to    | Yes      | Format of a data as a result              | `json`, `xml`, `yaml`, `props` |
-| token | No       | The GitHub token or personal access token | _&lt;token&gt;_                |
-<!-- prettier-ignore-end -->
+```yaml
+- uses: fabasoad/data-format-converter-action@v0
+  with:
+    # (Required) Path to the file with the data to be converted.
+    input: "report.xml"
+    # (Required) Format of a file. Possible values: json, xml, yaml, props.
+    from: "xml"
+    # (Required) Format of a file as a result. Possible values: json, xml, yaml,
+    # props.
+    to: "json"
+    # (Optional) The GitHub token or personal access token.
+    token: "${{ github.token }}"
+```
 
 ## Outputs
 
@@ -32,3 +37,7 @@ Converts data formats interchangeably. The following formats are supported: [XML
 
 - [Examples](./docs/Examples.md)
 - [FAQ](./docs/FAQ.md)
+
+## Contributions
+
+![Alt](https://repobeats.axiom.co/api/embed/6cfd2a64753a4c025099fea0e006aa7ec9d7c67a.svg "Repobeats analytics image")
