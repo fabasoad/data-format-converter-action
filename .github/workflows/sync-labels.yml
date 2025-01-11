@@ -1,5 +1,5 @@
 ---
-name: Sync Labels
+name: Labels
 
 on: # yamllint disable-line rule:truthy
   push:
@@ -8,7 +8,6 @@ on: # yamllint disable-line rule:truthy
   workflow_dispatch: {}
 
 jobs:
-  sync-labels:
-    name: Labels
+  maintenance:
+    name: Maintenance
     uses: fabasoad/reusable-workflows/.github/workflows/wf-sync-labels.yml@main
-    secrets: inherit # pragma: allowlist secret
