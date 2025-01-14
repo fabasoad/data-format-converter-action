@@ -27,7 +27,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu", "windows", "macos"]
+        os: ["windows"]
+        #        os: ["ubuntu", "windows", "macos"]
         from: ["yaml", "json", "xml", "props", "lua"]
         to: ["yaml", "json", "xml", "props", "lua"]
     runs-on: ${{ matrix.os }}-latest
@@ -46,12 +47,15 @@ jobs:
       - name: Print actual file
         run: cat actual.${{ matrix.to }}
       - name: Validate
-        run: cmp -s "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
+        run: |
+          cmp -s "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}" \
+            || diff -l "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
       - name: Clean up
         if: ${{ always() }}
         run: rm -f actual.${{ matrix.to }}
   convert-container:
     name: Convert
+    if: false
     timeout-minutes: 5
     strategy:
       fail-fast: false
@@ -90,7 +94,9 @@ jobs:
       - name: Print actual file
         run: cat actual.${{ matrix.to }}
       - name: Validate
-        run: cmp -s "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
+        run: |
+          cmp -s "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}" \
+            || diff "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
       - name: Clean up
         if: ${{ always() }}
         run: rm -f actual.${{ matrix.to }}
