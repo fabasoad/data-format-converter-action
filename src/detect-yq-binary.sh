@@ -3,17 +3,17 @@
 main() {
   os="$(uname -s)"
   arch="$(uname -m)"
-  binary="yq_"
+  binary="yq"
   case "${os}" in
     Darwin)
-      binary="${binary}_darwin_"
+      binary="${binary}_darwin"
       case "${arch}" in
         arm64) binary="${binary}_arm64" ;;
         *) binary="${binary}_amd64" ;;
       esac
       ;;
     FreeBSD)
-      binary="${binary}_freebsd_"
+      binary="${binary}_freebsd"
       case "${arch}" in
         amd64|x86_64) binary="${binary}_amd64" ;;
         i386|i686) binary="${binary}_386" ;;
@@ -21,7 +21,7 @@ main() {
       esac
       ;;
     NetBSD)
-      binary="${binary}_netbsd_"
+      binary="${binary}_netbsd"
       case "${arch}" in
         amd64|x86_64) binary="${binary}_amd64" ;;
         i386|i686) binary="${binary}_386" ;;
@@ -29,14 +29,14 @@ main() {
       esac
       ;;
     OpenBSD)
-      binary="${binary}_openbsd_"
+      binary="${binary}_openbsd"
       case "${arch}" in
         amd64|x86_64) binary="${binary}_amd64" ;;
         *) binary="${binary}_386" ;;
       esac
       ;;
     Linux)
-      binary="${binary}_linux_"
+      binary="${binary}_linux"
       case "${arch}" in
         aarch64) binary="${binary}_arm64" ;;
         x86_64) binary="${binary}_amd64" ;;
@@ -44,7 +44,7 @@ main() {
       esac
       ;;
     *)
-      binary="${binary}_windows_"
+      binary="${binary}_windows"
       case "${arch}" in
         x86_64) binary="${binary}_amd64" ;;
         *) binary="${binary}_386" ;;

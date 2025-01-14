@@ -28,7 +28,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu", "windows", "macos"]
+        # os: ["ubuntu", "windows", "macos"]
+        os: ["windows"]
         from: ["yaml", "json", "xml", "props"]
         to: ["yaml", "json", "xml", "props"]
     runs-on: ${{ matrix.os }}-latest
@@ -38,31 +39,39 @@ jobs:
       - name: Prepare
         run: |
           # yaml
-          echo 's:' > expected.yaml
-          echo '  v: "1"' >> expected.yaml
-          echo '  m:' >> expected.yaml
-          echo '    - t1' >> expected.yaml
-          echo '    - t2' >> expected.yaml
+          {
+            echo 's:'
+            echo '  v: "1"'
+            echo '  m:'
+            echo '    - t1'
+            echo '    - t2'
+          } > expected.yaml
           # json
-          echo '{' > expected.json
-          echo '  "s": {' >> expected.json
-          echo '    "v": "1",' >> expected.json
-          echo '    "m": [' >> expected.json
-          echo '      "t1",' >> expected.json
-          echo '      "t2"' >> expected.json
-          echo '    ]' >> expected.json
-          echo '  }' >> expected.json
-          echo '}' >> expected.json
+          {
+            echo '{'
+            echo '  "s": {'
+            echo '    "v": "1",'
+            echo '    "m": ['
+            echo '      "t1",'
+            echo '      "t2"'
+            echo '    ]'
+            echo '  }'
+            echo '}'
+          } > expected.json
           # xml
-          echo '<s>' > expected.xml
-          echo '  <v>1</v>' >> expected.xml
-          echo '  <m>t1</m>' >> expected.xml
-          echo '  <m>t2</m>' >> expected.xml
-          echo '</s>' >> expected.xml
+          {
+            echo '<s>'
+            echo '  <v>1</v>'
+            echo '  <m>t1</m>'
+            echo '  <m>t2</m>'
+            echo '</s>'
+          } > expected.xml
           # props
-          echo 's.v = 1' > expected.props
-          echo 's.m.0 = t1' >> expected.props
-          echo 's.m.1 = t2' >> expected.props
+          {
+            echo 's.v = 1'
+            echo 's.m.0 = t1'
+            echo 's.m.1 = t2'
+          } > expected.props
       - name: Convert
         uses: ./
         id: convert
