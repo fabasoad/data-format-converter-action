@@ -12,6 +12,7 @@ repos:
         language: node
         types: [text]
         args: []
+        exclude: "^(tests\/.*)$"
         # https://github.com/prettier/prettier/releases
         additional_dependencies: ["prettier@3.4.2"]
         stages: ["pre-commit"]

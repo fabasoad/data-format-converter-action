@@ -46,12 +46,10 @@ jobs:
       - name: Print actual file
         run: cat actual.${{ matrix.to }}
       - name: Validate
-        run: cmp -s "expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
+        run: cmp -s "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
       - name: Clean up
         if: ${{ always() }}
-        run: |
-          rm -f expected.{json,props,xml,yaml}
-          rm -f actual.${{ matrix.to }}
+        run: rm -f actual.${{ matrix.to }}
   convert-container:
     name: Convert
     timeout-minutes: 5
@@ -92,9 +90,7 @@ jobs:
       - name: Print actual file
         run: cat actual.${{ matrix.to }}
       - name: Validate
-        run: cmp -s "expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
+        run: cmp -s "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}" || diff "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
       - name: Clean up
         if: ${{ always() }}
-        run: |
-          rm -f expected.{json,props,xml,yaml}
-          rm -f actual.${{ matrix.to }}
+        run: rm -f actual.${{ matrix.to }}
