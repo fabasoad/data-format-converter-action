@@ -42,7 +42,10 @@ runs:
 
     - name: Collect info
       id: info
-      run: ./collect-info.sh
+      env:
+        INPUT_FROM: "${{ inputs.from }}"
+        INPUT_TO: "${{ inputs.to }}"
+      run: ./collect-info.sh "${INPUT_FROM}" "${INPUT_TO}"
       shell: sh
       working-directory: ${{ github.action_path }}/src
 

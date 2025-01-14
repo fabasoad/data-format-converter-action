@@ -28,8 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # os: ["ubuntu", "windows", "macos"]
-        os: ["windows"]
+        os: ["ubuntu", "windows", "macos"]
         from: ["yaml", "json", "xml", "props"]
         to: ["yaml", "json", "xml", "props"]
     runs-on: ${{ matrix.os }}-latest
@@ -93,7 +92,6 @@ jobs:
           rm -f actual.${{ matrix.to }}
   convert-container:
     name: Convert
-    if: false
     timeout-minutes: 5
     strategy:
       fail-fast: false
