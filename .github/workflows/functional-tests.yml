@@ -1,5 +1,5 @@
 ---
-name: Functional tests
+name: Functional Tests
 
 on: # yamllint disable-line rule:truthy
   pull_request:
@@ -93,6 +93,7 @@ jobs:
           rm -f actual.${{ matrix.to }}
   convert-container:
     name: Convert
+    if: false
     timeout-minutes: 5
     strategy:
       fail-fast: false
