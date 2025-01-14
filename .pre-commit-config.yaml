@@ -21,7 +21,7 @@ repos:
     hooks:
       - id: detect-secrets
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.22.1
+    rev: v8.23.0
     hooks:
       - id: gitleaks
   - repo: https://github.com/fabasoad/pre-commit-grype
@@ -37,6 +37,13 @@ repos:
     rev: v0.43.0
     hooks:
       - id: markdownlint-fix
+        stages: ["pre-commit"]
+  # Shell
+  - repo: https://github.com/openstack/bashate
+    rev: 2.1.1
+    hooks:
+      - id: bashate
+        args: ["-i", "E003,E006"]
         stages: ["pre-commit"]
   # Yaml
   - repo: https://github.com/adrienverge/yamllint
@@ -55,6 +62,10 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
+      - id: check-executables-have-shebangs
+        stages: ["pre-commit"]
+      - id: check-shebang-scripts-are-executable
+        stages: ["pre-commit"]
       - id: check-merge-conflict
       - id: check-json
         stages: ["pre-push"]
