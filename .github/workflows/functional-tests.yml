@@ -2,20 +2,19 @@
 name: Functional Tests
 
 on: # yamllint disable-line rule:truthy
-  pull_request:
-    branches:
-      - "main"
-    paths:
-      - ".github/workflows/functional-tests.yml"
-      - "action.yml"
   push:
     branches:
-      - "main"
+      - main
+  pull_request:
     paths:
-      - ".github/workflows/functional-tests.yml"
-      - "action.yml"
+      - .github/workflows/functional-tests.yml
+      - src/**
+      - tests/**
+      - action.yml
   schedule:
-    - cron: "0 0 * * 1"
+    # Every Friday at 09:00 JST
+    - cron: "0 0 * * 5"
+  workflow_dispatch: {}
 
 defaults:
   run:
@@ -29,56 +28,19 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu", "windows", "macos"]
-        from: ["yaml", "json", "xml", "props"]
-        to: ["yaml", "json", "xml", "props"]
+        from: ["yaml", "json", "xml", "props", "lua"]
+        to: ["yaml", "json", "xml", "props", "lua"]
     runs-on: ${{ matrix.os }}-latest
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v4
-      - name: Prepare
-        run: |
-          # yaml
-          {
-            echo 's:'
-            echo '  v: "1"'
-            echo '  m:'
-            echo '    - t1'
-            echo '    - t2'
-          } > expected.yaml
-          # json
-          {
-            echo '{'
-            echo '  "s": {'
-            echo '    "v": "1",'
-            echo '    "m": ['
-            echo '      "t1",'
-            echo '      "t2"'
-            echo '    ]'
-            echo '  }'
-            echo '}'
-          } > expected.json
-          # xml
-          {
-            echo '<s>'
-            echo '  <v>1</v>'
-            echo '  <m>t1</m>'
-            echo '  <m>t2</m>'
-            echo '</s>'
-          } > expected.xml
-          # props
-          {
-            echo 's.v = 1'
-            echo 's.m.0 = t1'
-            echo 's.m.1 = t2'
-          } > expected.props
       - name: Convert
         uses: ./
         id: convert
         with:
-          input: expected.${{ matrix.from }}
+          input: tests/expected.${{ matrix.from }}
           from: ${{ matrix.from }}
           to: ${{ matrix.to }}
-          token: ${{ secrets.PAT_GITHUB }}
       - name: Save result
         run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
       - name: Print actual file
@@ -97,8 +59,8 @@ jobs:
       fail-fast: false
       matrix:
         image: ["alpine", "centos"]
-        from: ["yaml", "json", "xml", "props"]
-        to: ["yaml", "json", "xml", "props"]
+        from: ["yaml", "json", "xml", "props", "lua"]
+        to: ["yaml", "json", "xml", "props", "lua"]
         include:
           - image: alpine
             setup-command: ""
@@ -118,50 +80,13 @@ jobs:
         run: ${{ matrix.setup-command }}
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v4
-      - name: Prepare
-        run: |
-          # yaml
-          {
-            echo 's:'
-            echo '  v: "1"'
-            echo '  m:'
-            echo '    - t1'
-            echo '    - t2'
-          } > expected.yaml
-          # json
-          {
-            echo '{'
-            echo '  "s": {'
-            echo '    "v": "1",'
-            echo '    "m": ['
-            echo '      "t1",'
-            echo '      "t2"'
-            echo '    ]'
-            echo '  }'
-            echo '}'
-          } > expected.json
-          # xml
-          {
-            echo '<s>'
-            echo '  <v>1</v>'
-            echo '  <m>t1</m>'
-            echo '  <m>t2</m>'
-            echo '</s>'
-          } > expected.xml
-          # props
-          {
-            echo 's.v = 1'
-            echo 's.m.0 = t1'
-            echo 's.m.1 = t2'
-          } > expected.props
       - name: Convert
         uses: ./
         id: convert
         with:
-          input: expected.${{ matrix.from }}
+          input: tests/expected.${{ matrix.from }}
           from: ${{ matrix.from }}
           to: ${{ matrix.to }}
-          token: ${{ secrets.PAT_GITHUB }}
       - name: Save result
         run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
       - name: Print actual file
