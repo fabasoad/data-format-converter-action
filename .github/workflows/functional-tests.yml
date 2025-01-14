@@ -46,10 +46,15 @@ jobs:
         run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
       - name: Print actual file
         run: cat actual.${{ matrix.to }}
+      - name: Transform EOL to Unix-style
+        if: ${{ matrix.os == 'windows' }}
+        run: |
+          tr -d '\r' < actual.${{ matrix.to }} > temp_file \
+            && mv temp_file actual.${{ matrix.to }}
       - name: Validate
         run: |
           cmp -s "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}" \
-            || diff -l "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
+            || diff "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
       - name: Clean up
         if: ${{ always() }}
         run: rm -f actual.${{ matrix.to }}
@@ -91,8 +96,6 @@ jobs:
           to: ${{ matrix.to }}
       - name: Save result
         run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
-      - name: Print actual file
-        run: cat actual.${{ matrix.to }}
       - name: Validate
         run: |
           cmp -s "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}" \
