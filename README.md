@@ -7,7 +7,8 @@
 ![security](https://github.com/fabasoad/data-format-converter-action/actions/workflows/security.yml/badge.svg)
 
 Converts data formats interchangeably. The following formats are supported: [XML](https://www.w3schools.com/xml/),
-[YAML](https://yaml.org/), [JSON](https://www.json.org/json-en.html), [PROPS](https://www.ibm.com/docs/en/was/8.5.5?topic=SSEQTP_8.5.5/com.ibm.websphere.nd.multiplatform.doc/ae/rxml_prop_file_syntax.html).
+[YAML](https://yaml.org/), [JSON](https://www.json.org/json-en.html), [PROPS](https://www.ibm.com/docs/en/was/8.5.5?topic=SSEQTP_8.5.5/com.ibm.websphere.nd.multiplatform.doc/ae/rxml_prop_file_syntax.html),
+[Lua](https://github.com/lua/lua).
 
 ## Inputs
 

@@ -57,8 +57,8 @@ main() {
   input_token="${4}"
 
   check_if_file_exists "input" "${input_input}"
-  check_enum "from" "${input_from}" "json,xml,yaml,props"
-  check_enum "to" "${input_to}" "json,xml,yaml,props"
+  check_enum "from" "${input_from}" "json,xml,yaml,props,lua"
+  check_enum "to" "${input_to}" "json,xml,yaml,props,lua"
   check_is_not_empty "token" "${input_token}"
 }
 
