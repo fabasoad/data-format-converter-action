@@ -27,8 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["windows"]
-        #        os: ["ubuntu", "windows", "macos"]
+        os: ["ubuntu", "windows", "macos"]
         from: ["yaml", "json", "xml", "props", "lua"]
         to: ["yaml", "json", "xml", "props", "lua"]
     runs-on: ${{ matrix.os }}-latest
@@ -55,7 +54,6 @@ jobs:
         run: rm -f actual.${{ matrix.to }}
   convert-container:
     name: Convert
-    if: false
     timeout-minutes: 5
     strategy:
       fail-fast: false
@@ -94,7 +92,7 @@ jobs:
       - name: Validate
         run: |
           cmp -s "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}" \
-            || diff "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
+            || diff --strip-trailing-cr "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
       - name: Clean up
         if: ${{ always() }}
         run: rm -f actual.${{ matrix.to }}
