@@ -33,13 +33,12 @@ runs:
         INPUT_TO: "${{ inputs.to }}"
         INPUT_TOKEN: "${{ inputs.token }}"
       run: |
-        ./validate-inputs.sh \
+        ${GITHUB_ACTION_PATH}/src/validate-inputs.sh \
           "${INPUT_INPUT}" \
           "${INPUT_FROM}" \
           "${INPUT_TO}" \
           "${INPUT_TOKEN}"
       shell: sh
-      working-directory: ${{ github.action_path }}/src
 
     - name: Collect info
       id: info

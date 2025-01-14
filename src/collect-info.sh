@@ -10,7 +10,7 @@ main() {
   yq_installed=$(if command -v yq >/dev/null 2>&1; then echo true; else echo false; fi)
   echo "yq-installed=${yq_installed}" >> "$GITHUB_OUTPUT"
 
-  yq_temp_file_path=".data-format-converter-action"
+  yq_temp_file_path="${RUNNER_TEMP}/.data-format-converter-action-$(date +%s)"
   echo "yq-temp-file-path=${yq_temp_file_path}" >> "$GITHUB_OUTPUT"
 
   bin_dir="yq_$(date +%s)"
