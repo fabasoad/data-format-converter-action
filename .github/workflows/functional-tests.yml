@@ -44,7 +44,7 @@ jobs:
         run: cat ${{ steps.convert.outputs.result-path }}/expected-${{ matrix.from }}.${{ matrix.to }}
       - name: Validate
         run: |
-          original_file_path="tests/expected-${{ matrix.from }}.${{ matrix.to }}"
+          original_file_path="tests/expected-${{ matrix.from }}.${{ matrix.from }}"
           converted_file_path="${{ steps.convert.outputs.result-path }}/expected-${{ matrix.from }}.${{ matrix.to }}"
           cmp -s "${original_file_path}" "${converted_file_path}" \
             || diff --strip-trailing-cr "${original_file_path}" "${converted_file_path}"

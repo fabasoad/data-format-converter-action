@@ -48,6 +48,7 @@ main() {
         log_warning "${msg}"
       elif [ "${source_file_ext}" = "${input_to}" ]; then
         cp "${source_file}" "${result_path}/${target_file}"
+        log_info "Copied ${source_file} to ${target_file}"
       else
         ${yq_path} \
           -P "${source_file}" \

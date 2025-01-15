@@ -74,7 +74,7 @@ runs:
         latest: "true"
         fileName: "${{ steps.binary.outputs.name }}"
         out-file-path: "${{ steps.info.outputs.bin-dir }}"
-        token: "${{ inputs.token }}"
+        token: "${{ inputs.github-token }}"
 
     - name: Install mikefarah/yq
       if: ${{ inputs.from != inputs.to && steps.info.outputs.yq-installed == 'false' }}
