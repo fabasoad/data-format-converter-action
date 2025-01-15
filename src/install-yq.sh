@@ -12,8 +12,6 @@ main() {
   tag_name="${3}"
 
   yq_path="${bin_path}/yq"
-  echo "yq-path=${yq_path}" >> "$GITHUB_OUTPUT"
-
   mv "${bin_path}/${binary_name}" "${yq_path}"
   if [ "${RUNNER_OS}" != "Windows" ]; then
     chmod +x "${yq_path}"

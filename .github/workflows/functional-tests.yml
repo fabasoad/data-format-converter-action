@@ -38,20 +38,16 @@ jobs:
         uses: ./
         id: convert
         with:
-          input: tests/expected.${{ matrix.from }}
-          from: ${{ matrix.from }}
+          source-pattern: tests/expected-${{ matrix.from }}.${{ matrix.from }}
           to: ${{ matrix.to }}
-      - name: Save result
-        run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
-      - name: Print actual file
-        run: cat actual.${{ matrix.to }}
+      - name: Print converted file
+        run: cat ${{ steps.convert.outputs.result-path }}/expected-${{ matrix.from }}.${{ matrix.to }}
       - name: Validate
         run: |
-          cmp -s "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}" \
-            || diff --strip-trailing-cr "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
-      - name: Clean up
-        if: ${{ always() }}
-        run: rm -f actual.${{ matrix.to }}
+          original_file_path="tests/expected-${{ matrix.from }}.${{ matrix.to }}"
+          converted_file_path="${{ steps.convert.outputs.result-path }}/expected-${{ matrix.from }}.${{ matrix.to }}"
+          cmp -s "${original_file_path}" "${converted_file_path}" \
+            || diff --strip-trailing-cr "${original_file_path}" "${converted_file_path}"
   convert-container:
     name: Convert
     timeout-minutes: 5
@@ -84,15 +80,13 @@ jobs:
         uses: ./
         id: convert
         with:
-          input: tests/expected.${{ matrix.from }}
-          from: ${{ matrix.from }}
+          source-pattern: tests/expected-${{ matrix.from }}.${{ matrix.from }}
           to: ${{ matrix.to }}
-      - name: Save result
-        run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
+      - name: Print converted file
+        run: cat ${{ steps.convert.outputs.result-path }}/expected-${{ matrix.from }}.${{ matrix.to }}
       - name: Validate
         run: |
-          cmp -s "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}" \
-            || diff --strip-trailing-cr "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
-      - name: Clean up
-        if: ${{ always() }}
-        run: rm -f actual.${{ matrix.to }}
+          original_file_path="tests/expected-${{ matrix.from }}.${{ matrix.to }}"
+          converted_file_path="${{ steps.convert.outputs.result-path }}/expected-${{ matrix.from }}.${{ matrix.to }}"
+          cmp -s "${original_file_path}" "${converted_file_path}" \
+            || diff --strip-trailing-cr "${original_file_path}" "${converted_file_path}"
