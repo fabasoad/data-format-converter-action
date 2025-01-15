@@ -1,143 +1,343 @@
 # Examples
 
-## 1. YAML to JSON
+## Various Formats
 
-### 1.1. Initial data
+### From JSON
 
-`docker-compose.yml` is a file to be converted into `JSON` with the following
-content:
+#### To XML
 
 ```yaml
-version: "3.7"
-services:
-  mongo:
-    image: mongo:4.2.3-bionic
-    networks:
-      - test-network
-
-networks:
-  test-network:
-    name: test-network
-    driver: bridge
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.json"
+    to: "xml"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.xml
 ```
 
-### 1.2. Workflow configuration
+#### To YAML
 
 ```yaml
-- uses: fabasoad/data-format-converter-action@v0
-  id: yaml2json
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
   with:
-    input: "docker-compose.yml"
-    from: "yaml"
+    source-pattern: "config.json"
+    to: "yaml"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.yaml
+```
+
+#### To PROPS
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.json"
+    to: "props"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.props
+```
+
+#### To Lua
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.json"
+    to: "lua"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.lua
+```
+
+### From XML
+
+#### To JSON
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.xml"
     to: "json"
-- name: Print result
-  run: echo "${{ steps.yaml2json.outputs.output }}"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.json
 ```
 
-### 1.3. Result
-
-```json
-{
-  "version": 3.7,
-  "services": {
-    "mongo": {
-      "image": "mongo:4.2.3-bionic",
-      "networks": ["test-network"]
-    }
-  },
-  "networks": {
-    "test-network": {
-      "name": "test-network",
-      "driver": "bridge"
-    }
-  }
-}
-```
-
-## 2. XML to YAML
-
-### 2.1. Initial data
-
-`person.xml` is a file to be converted into `YAML` with the following
-content:
-
-```xml
-<person>
-    <name>John Doe</name>
-    <age>32</age>
-    <hobbies>Music</hobbies>
-    <hobbies>PC Games</hobbies>
-</person>
-```
-
-### 2.2. Workflow configuration
+#### To YAML
 
 ```yaml
-- uses: fabasoad/data-format-converter-action@v0
-  id: xml2yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
   with:
-    input: "person.xml"
+    source-pattern: "config.xml"
+    to: "yaml"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.yaml
+```
+
+#### To PROPS
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.xml"
+    to: "props"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.props
+```
+
+#### To Lua
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.xml"
+    to: "lua"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.lua
+```
+
+### From YAML
+
+#### To JSON
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.yaml"
+    to: "json"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.json
+```
+
+#### To XML
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.yaml"
+    to: "xml"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.xml
+```
+
+#### To PROPS
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.yaml"
+    to: "props"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.props
+```
+
+#### To Lua
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.yaml"
+    to: "lua"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.lua
+```
+
+### From PROPS
+
+#### To JSON
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.props"
+    to: "json"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.json
+```
+
+#### To XML
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.props"
+    to: "xml"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.xml
+```
+
+#### To YAML
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.props"
+    to: "yaml"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.yaml
+```
+
+#### To Lua
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.props"
+    to: "lua"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.lua
+```
+
+### From Lua
+
+#### To JSON
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.lua"
+    to: "json"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.json
+```
+
+#### To XML
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.lua"
+    to: "xml"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.xml
+```
+
+#### To YAML
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.lua"
+    to: "yaml"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.yaml
+```
+
+#### To PROPS
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "config.lua"
+    to: "props"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.props
+```
+
+## Glob patterns
+
+### Single file
+
+Assuming that there is only one `config.lua` file.
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "**/config.lua"
+    to: "props"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.props
+```
+
+### All supported files from directory
+
+Assuming that you have:
+
+```text
+- tests/
+  - sanity/
+    - config.xml
+    - advanced.props
+  - nightly/
+    - examples.json
+```
+
+Then the following step will convert all of them into YAML files:
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "tests/**/*"
+    to: "yaml"
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see: config.yaml, advanced.yaml, examples.yaml
+```
+
+### Certain files from directory
+
+Assuming that you want to convert only XML files into YAML with this structure:
+
+```text
+- tests/
+  - sanity/
+    - config.xml
+    - advanced.props
+  - nightly/
+    - examples.json
+```
+
+Then the following step will convert only `config.xml`:
+
+```yaml
+- uses: fabasoad/data-format-converter-action@v1
+  id: converter
+  with:
+    source-pattern: "tests/**/*"
     from: "xml"
     to: "yaml"
-- name: Print result
-  run: echo "${{ steps.xml2yaml.outputs.output }}"
-```
-
-### 2.3. Result
-
-```yaml
-person:
-  name: John Doe
-  age: 32
-  hobbies:
-    - Music
-    - PC Games
-```
-
-## 3. Use GitHub token
-
-There are 2 options on how you can use GitHub token - PAT and GitHub app token.
-You can select any of these options based on your needs.
-
-### Option 1: Personal access token (PAT)
-
-1. [Create PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic)
-   with `repo` permission.
-2. [Create repository secret](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions)
-   (e.g. `MY_GITHUB_TOKEN`) with the PAT value.
-3. Use the following configuration:
-
-```yaml
-- uses: fabasoad/data-format-converter-action@v0
-  with:
-    input: "person.xml"
-    from: "xml"
-    to: "yaml"
-    token: ${{ secrets.MY_GITHUB_TOKEN }}
-```
-
-### Option 2: GitHub App token
-
-1. [Register a GitHub App](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app)
-   with `contents: read` permission.
-2. Create private key and save it somewhere on your local disk.
-3. [Install GitHub App](https://docs.github.com/en/apps/using-github-apps/installing-your-own-github-app)
-   to your repository.
-4. [Create repository secret](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions)
-   (e.g. `APP_PRIVATE_KEY`) with the private key created on step 2.
-5. Create repository variable (e.g. `APP_ID`) with the GitHub App ID.
-6. Use the following configuration:
-
-```yaml
-- uses: actions/create-github-app-token@v1
-  id: generate-app-token
-  with:
-    app-id: ${{ vars.APP_ID }}
-    private-key: ${{ secrets.APP_PRIVATE_KEY }}
-- uses: fabasoad/data-format-converter-action@v0
-  with:
-    input: "person.xml"
-    from: "xml"
-    to: "yaml"
-    token: ${{ steps.generate-app-token.outputs.token }}
+- name: List resulting files
+  run: ls ${{ steps.converter.outputs.result-path }}
+  # You should see a single file: config.yaml
 ```

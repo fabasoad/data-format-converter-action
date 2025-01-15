@@ -18,6 +18,7 @@ check_is_not_empty() {
 #    users.
 # 2. (Required) Param value that will be validated.
 # 3. (Required) Possible values for the param value to be valid.
+# 4. (Optional) Additional message if validation fails.
 #
 # Usage examples:
 # check_enum "my-bool-param" "true" "true,false"
@@ -27,7 +28,11 @@ check_enum() {
     *",${2},"*)
       ;;
     *)
-      msg="\"${1}\" parameter is invalid. Possible values: $(echo "${3}" | sed 's/,/, /g')."
+      msg=""
+      if [ -n "${4}" ]; then
+        msg=". ${4}"
+      fi
+      msg="\"${1}\" parameter is invalid. Possible values: $(echo "${3}" | sed 's/,/, /g')${msg}."
       echo "::error title=Invalid parameter::${msg}"
       exit 1
       ;;
@@ -51,15 +56,17 @@ check_if_file_exists() {
 }
 
 main() {
-  input_input="${1}"
+  input_source_pattern="${1}"
   input_from="${2}"
   input_to="${3}"
-  input_token="${4}"
+  input_github_token="${4}"
 
-  check_if_file_exists "input" "${input_input}"
-  check_enum "from" "${input_from}" "json,xml,yaml,props,lua"
+  check_is_not_empty "source-pattern" "${input_source_pattern}"
+  if [ -n "${input_from}" ]; then
+    check_enum "from" "${input_from}" "json,xml,yaml,props,lua" "Either leave it empty or select one from the possible options"
+  fi
   check_enum "to" "${input_to}" "json,xml,yaml,props,lua"
-  check_is_not_empty "token" "${input_token}"
+  check_is_not_empty "github-token" "${input_github_token}"
 }
 
 main "$@"

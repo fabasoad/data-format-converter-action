@@ -10,11 +10,14 @@ main() {
   binary_name="${1}"
   bin_path="${2}"
   tag_name="${3}"
-  mv "${bin_path}/${binary_name}" "${bin_path}/yq"
+
+  yq_path="${bin_path}/yq"
+  echo "yq-path=${yq_path}" >> "$GITHUB_OUTPUT"
+
+  mv "${bin_path}/${binary_name}" "${yq_path}"
   if [ "${RUNNER_OS}" != "Windows" ]; then
-    chmod +x "${bin_path}/yq"
+    chmod +x "${yq_path}"
   fi
-  echo "${bin_path}" >> "$GITHUB_PATH"
   log_info "${binary_name}@${tag_name} has been installed"
 }
 
