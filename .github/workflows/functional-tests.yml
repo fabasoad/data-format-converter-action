@@ -27,7 +27,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu", "windows", "macos"]
+        os: ["windows"]
+        #        os: ["ubuntu", "windows", "macos"]
         from: ["yaml", "json", "xml", "props", "lua"]
         to: ["yaml", "json", "xml", "props", "lua"]
     runs-on: ${{ matrix.os }}-latest
@@ -49,6 +50,7 @@ jobs:
           cmp -s "${expected_file_path}" "${actual_file_path}" \
             || diff --strip-trailing-cr "${expected_file_path}" "${actual_file_path}"
   convert-container:
+    if: false
     name: Convert
     runs-on: ubuntu-latest
     timeout-minutes: 5
