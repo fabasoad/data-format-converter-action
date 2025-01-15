@@ -61,7 +61,9 @@ jobs:
               exit 1
             fi
           }
-          actual_files_amount=$(find "${{ steps.convert.outputs.result-path }}" -type f \( -name "*.json" -o -name "*.xml" -o -name "*.yaml" -o -name "*.props" -o -name "*.lua" \) | wc -l | xargs)
+          actual_files_amount=$(find "${{ steps.convert.outputs.result-path }}" \
+            -type f \( -name "*.json" -o -name "*.xml" -o -name "*.yaml" -o -name "*.props" -o -name "*.lua" \) \
+            | wc -l | xargs)
           test_equal "Amount of files is wrong" \
             "${actual_files_amount}" \
             "${{ matrix.expected-files-amount }}"
