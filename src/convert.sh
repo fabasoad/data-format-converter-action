@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-# Enable globbing in bash
-shopt -s globstar
-shopt -s nullglob
-
 SCRIPT_PATH=$(realpath "$0")
 SRC_DIR_PATH=$(dirname "$SCRIPT_PATH")
 LIB_DIR_PATH="${SRC_DIR_PATH}/lib"
@@ -22,6 +18,7 @@ main() {
 
   result_path="${RUNNER_TEMP}/data-format-converter-action-$(date +%s)"
   mkdir -p "${result_path}"
+  echo "result-path=${result_path}" >> "$GITHUB_OUTPU"
   log_info "Converting files into target directory: ${result_path}"
 
   for source_file in "${source_files[@]}"; do
@@ -57,7 +54,7 @@ main() {
           -p "${source_file_ext}" \
           -o "${input_to}" \
           > "${result_path}/${target_file}"
-        log_info "Converted ${source_file} into ${target_file}."
+        log_info "Converted ${source_file} into ${target_file}"
       fi
     fi
   done

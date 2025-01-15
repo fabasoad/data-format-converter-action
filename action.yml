@@ -30,7 +30,7 @@ outputs:
     description: |
       The absolute path to the directory with the converted files inside. The
       name of each converted file is the same as the source file.
-    value: ${{ steps.result.outputs.data }}
+    value: ${{ steps.convert.outputs.result-path }}
 runs:
   using: "composite"
   steps:
@@ -93,6 +93,7 @@ runs:
       shell: sh
 
     - name: Convert
+      id: convert
       env:
         INPUT_FROM: "${{ inputs.from }}"
         INPUT_TO: "${{ inputs.to }}"
