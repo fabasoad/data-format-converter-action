@@ -23,6 +23,10 @@ main() {
 
   for source_file in "${source_files[@]}"; do
     source_file_ext="${source_file##*.}"
+    # Replace yml with yaml
+    if [ "${source_file_ext}" = "yml" ]; then
+      source_file_ext="yaml"
+    fi
     process="false"
     # If "from" is empty then we check if current file is one of the supported
     # data types.

@@ -36,7 +36,7 @@ jobs:
           - source-pattern: "tests/*"
             from: ""
             to: "props"
-            expected-files-amount: "5"
+            expected-files-amount: "6"
           - source-pattern: "tests/*"
             from: "xml"
             to: "props"
