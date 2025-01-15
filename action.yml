@@ -89,7 +89,7 @@ runs:
 
     - name: Print yq version
       if: ${{ inputs.from != inputs.to }}
-      run: ${{ steps.install-yq.outputs.yq-path }} --version
+      run: ${{ steps.info.outputs.yq-path }} --version
       shell: sh
 
     - name: Convert
@@ -98,9 +98,8 @@ runs:
         INPUT_TO: "${{ inputs.to }}"
         INPUT_SOURCE_PATTERN: "${{ inputs.source-pattern }}"
       run: |
-        yq_path="${{ steps.install-yq.outputs.yq-path }}"
         ${GITHUB_ACTION_PATH}/src/convert.sh \
-          "${yq_path:-none}" \
+          "${{ steps.info.outputs.yq-path }}" \
           "${INPUT_FROM:-all}" \
           "${INPUT_TO}" \
           "${INPUT_SOURCE_PATTERN}"
