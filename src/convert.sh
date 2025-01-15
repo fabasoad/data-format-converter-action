@@ -18,7 +18,7 @@ main() {
 
   result_path="${RUNNER_TEMP}/data-format-converter-action-$(date +%s)"
   mkdir -p "${result_path}"
-  echo "result-path=${result_path}" >> "$GITHUB_OUTPU"
+  echo "result-path=${result_path}" >> "$GITHUB_OUTPUT"
   log_info "Converting files into target directory: ${result_path}"
 
   for source_file in "${source_files[@]}"; do
