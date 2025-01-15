@@ -23,6 +23,9 @@ main() {
   else
     yq_installed="false"
     yq_path="${bin_path}/yq"
+    if [ "${RUNNER_OS}" = "Windows" ]; then
+      yq_path="${yq_path}.exe"
+    fi
     log_info "yq is not found. Executing installation."
   fi
   echo "yq-installed=${yq_installed}" >> "$GITHUB_OUTPUT"

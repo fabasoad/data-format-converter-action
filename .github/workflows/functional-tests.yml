@@ -50,7 +50,10 @@ jobs:
             || diff --strip-trailing-cr "${expected_file_path}" "${actual_file_path}"
   convert-container:
     name: Convert
+    runs-on: ubuntu-latest
     timeout-minutes: 5
+    container:
+      image: ${{ matrix.image }}:latest
     strategy:
       fail-fast: false
       matrix:
@@ -59,17 +62,14 @@ jobs:
         to: ["yaml", "json", "xml", "props", "lua"]
         include:
           - image: alpine
-            setup-command: ""
+            setup-command: apk add bash
           - image: centos
             setup-command: |
               sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
               sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
               yum update -y
               # cmp
-              yum install -y diffutils
-    runs-on: ubuntu-latest
-    container:
-      image: ${{ matrix.image }}:latest
+              yum install -y diffutils bash
     steps:
       - name: Setup
         if: ${{ matrix.setup-command != '' }}

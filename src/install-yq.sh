@@ -10,8 +10,8 @@ main() {
   binary_name="${1}"
   bin_path="${2}"
   tag_name="${3}"
+  yq_path="${4}"
 
-  yq_path="${bin_path}/yq"
   mv "${bin_path}/${binary_name}" "${yq_path}"
   if [ "${RUNNER_OS}" != "Windows" ]; then
     chmod +x "${yq_path}"
