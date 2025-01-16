@@ -22,8 +22,7 @@ defaults:
 
 jobs:
   test-source-pattern:
-    if: false
-    name: Convert ("${{ matrix.source-pattern }}", "${{ matrix.from }}")
+    name: Convert (${{ matrix.source-pattern }}${{ matrix.from == '' && '' || format(', {0}', matrix.from) }})
     runs-on: ubuntu-latest
     timeout-minutes: 5
     strategy:
