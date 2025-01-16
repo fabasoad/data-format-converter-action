@@ -24,7 +24,7 @@ main() {
 
   sep="/"
   if [ "${RUNNER_OS}" = "Windows" ]; then
-    sep="\"
+    sep="\\"
   fi
 
   bin_path="${GITHUB_WORKSPACE}${sep}${bin_dir}"
