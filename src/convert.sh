@@ -17,6 +17,9 @@ main() {
   source_files=($input_source_path)
 
   result_path="${RUNNER_TEMP}/data-format-converter-action-$(date +%s)"
+  if [ "${RUNNER_OS}" = "Windows" ]; then
+    result_path="$(cygpath -u "${result_path}")"
+  fi
   mkdir -p "${result_path}"
   echo "result-path=${result_path}" >> "$GITHUB_OUTPUT"
   log_info "Converting files into target directory: ${result_path}"
