@@ -12,3 +12,7 @@ log() {
 log_info() {
   log "info" "${1}"
 }
+
+log_warning() {
+  log "warning" "${1}"
+}

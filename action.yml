@@ -1,46 +1,56 @@
 ---
-name: "Data Format Converter Action"
+name: Data Format Converter Action
 author: Yevhen Fabizhevskyi
-description: "GitHub action that converts YAML / JSON / XML / PROPS data formats interchangeably"
+description: |
+  GitHub action that converts YAML / JSON / XML / PROPS / Lua data formats interchangeably
 branding:
   icon: copy
   color: green
 inputs:
-  input:
-    description: "Path to the file with the data to be converted."
+  source-pattern:
+    description: |
+      Pattern in glob format that would be used to list the files.
     required: true
   from:
-    description: "Format of a file. Possible values: json, xml, yaml, props."
-    required: true
+    description: |
+      Data type of the source files. Possible values: json, xml, yaml, props, lua.
+      Defaults to the type defined by file extension.
+    required: false
   to:
-    description: "Format of a file as a result. Possible values: json, xml, yaml, props."
+    description: |
+      Data type to be converted to. Possible values: json, xml, yaml, props, lua.
     required: true
-  token:
-    description: "The GitHub token or personal access token"
+  github-token:
+    description: |
+      GitHub token that is used to send requests to GitHub API such as downloading
+      asset. Defaults to the token provided by GitHub Actions environment.
     required: false
     default: ${{ github.token }}
 outputs:
-  output:
-    description: "Converted data."
-    value: ${{ steps.result.outputs.data }}
+  result-path:
+    description: |
+      The absolute path to the directory with the converted files inside. The
+      name of each converted file is the same as the source file.
+    value: ${{ steps.convert.outputs.result-path }}
 runs:
   using: "composite"
   steps:
     - name: Validate inputs
       env:
-        INPUT_INPUT: "${{ inputs.input }}"
+        INPUT_SOURCE_PATTERN: "${{ inputs.source-pattern }}"
         INPUT_FROM: "${{ inputs.from }}"
         INPUT_TO: "${{ inputs.to }}"
-        INPUT_TOKEN: "${{ inputs.token }}"
+        INPUT_GITHUB_TOKEN: "${{ inputs.github-token }}"
       run: |
         ${GITHUB_ACTION_PATH}/src/validate-inputs.sh \
-          "${INPUT_INPUT}" \
+          "${INPUT_SOURCE_PATTERN}" \
           "${INPUT_FROM}" \
           "${INPUT_TO}" \
-          "${INPUT_TOKEN}"
+          "${INPUT_GITHUB_TOKEN}"
       shell: sh
 
     - name: Collect info
+      if: ${{ inputs.from != inputs.to }}
       id: info
       env:
         INPUT_FROM: "${{ inputs.from }}"
@@ -49,19 +59,12 @@ runs:
       shell: sh
       working-directory: ${{ github.action_path }}/src
 
-    - name: Detect yq binary based on OS
+    - name: Define yq binary based on OS
       if: ${{ inputs.from != inputs.to && steps.info.outputs.yq-installed == 'false' }}
-      id: binary
-      run: ./detect-yq-binary.sh
+      id: define-binary
+      run: ./define-yq-binary.sh
       shell: sh
       working-directory: ${{ github.action_path }}/src
-
-    - name: Check same from and to
-      if: ${{ inputs.from == inputs.to }}
-      env:
-        INPUT_INPUT: "${{ inputs.input }}"
-      run: cp "${INPUT_INPUT}" "${{ steps.info.outputs.yq-temp-file-path }}"
-      shell: sh
 
     - name: Download mikefarah/yq
       if: ${{ inputs.from != inputs.to && steps.info.outputs.yq-installed == 'false' }}
@@ -70,44 +73,40 @@ runs:
       with:
         repository: "mikefarah/yq"
         latest: "true"
-        fileName: "${{ steps.binary.outputs.name }}"
+        fileName: "${{ steps.define-binary.outputs.name }}"
         out-file-path: "${{ steps.info.outputs.bin-dir }}"
-        token: "${{ inputs.token }}"
+        token: "${{ inputs.github-token }}"
 
     - name: Install mikefarah/yq
-      if: ${{ inputs.from != inputs.to && steps.info.outputs.yq-installed == 'false' }}
+      if: ${{ inputs.from != inputs.to }}
+      id: install-yq
       run: |
-        ./install-yq.sh \
-          "${{ steps.binary.outputs.name }}" \
-          "${{ steps.info.outputs.bin-path }}" \
-          "${{ steps.download-binary.outputs.tag_name }}"
+        if [ "${{ steps.info.outputs.yq-installed }}" = "true" ]; then
+          yq_path="$(which yq)"
+        else
+          yq_path="${{ steps.info.outputs.bin-path }}/${{ steps.define-binary.outputs.name }}"
+          if [ "$RUNNER_OS" != "Windows" ]; then
+            chmod +x "${yq_path}"
+          fi
+        fi
+        echo "yq-path=${yq_path}" >> "$GITHUB_OUTPUT"
       shell: sh
-      working-directory: ${{ github.action_path }}/src
 
     - name: Print yq version
       if: ${{ inputs.from != inputs.to }}
-      run: yq --version
+      run: ${{ steps.install-yq.outputs.yq-path }} --version
       shell: sh
 
     - name: Convert
-      if: ${{ inputs.from != inputs.to }}
+      id: convert
       env:
-        INPUTS_INPUT: "${{ inputs.input }}"
-        INPUTS_FROM: "${{ inputs.from }}"
-        INPUTS_TO: "${{ inputs.to }}"
+        INPUT_FROM: "${{ inputs.from }}"
+        INPUT_TO: "${{ inputs.to }}"
+        INPUT_SOURCE_PATTERN: "${{ inputs.source-pattern }}"
       run: |
-        yq \
-          -P "${INPUTS_INPUT}" \
-          -p "${INPUTS_FROM}" \
-          -o "${INPUTS_TO}" \
-          > "${{ steps.info.outputs.yq-temp-file-path }}"
-      shell: sh
-
-    - name: Save output
-      id: result
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const fs = require('fs');
-          core.setOutput('data', fs.readFileSync('${{ steps.info.outputs.yq-temp-file-path }}', 'utf-8').replace(/\s+$/gm, ''));
-          fs.unlinkSync('${{ steps.info.outputs.yq-temp-file-path }}');
+        ${GITHUB_ACTION_PATH}/src/convert.sh \
+          "${{ steps.install-yq.outputs.yq-path }}" \
+          "${INPUT_FROM:-all}" \
+          "${INPUT_TO}" \
+          "${INPUT_SOURCE_PATTERN}"
+      shell: bash

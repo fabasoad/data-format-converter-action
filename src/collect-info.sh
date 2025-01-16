@@ -10,26 +10,27 @@ main() {
   input_from="${1}"
   input_to="${2}"
 
-  if [ "${input_from}" != "${input_to}" ]; then
-    if command -v yq >/dev/null 2>&1; then
-      yq_installed="true"
-      log_info "yq is found at $(which yq). Installation skipped."
-    else
-      yq_installed="false"
-      log_info "yq is not found. Executing installation."
-    fi
-    echo "yq-installed=${yq_installed}" >> "$GITHUB_OUTPUT"
+  if command -v yq >/dev/null 2>&1; then
+    yq_installed="true"
+    log_info "yq is found at ${yq_path}. Installation skipped."
+  else
+    yq_installed="false"
+    log_info "yq is not found. Executing installation."
+  fi
+  echo "yq-installed=${yq_installed}" >> "$GITHUB_OUTPUT"
 
+  bin_dir="yq_$(date +%s)"
+  echo "bin-dir=${bin_dir}" >> "$GITHUB_OUTPUT"
 
-    bin_dir="yq_$(date +%s)"
-    echo "bin-dir=${bin_dir}" >> "$GITHUB_OUTPUT"
-
-    bin_path="$GITHUB_WORKSPACE/${bin_dir}"
-    echo "bin-path=${bin_path}" >> "$GITHUB_OUTPUT"
+  # Convert Windows-style path into Unix-style path:
+  # D:\data\test.xml > /d/data/test.xml
+  workspace="${GITHUB_WORKSPACE}"
+  if [ "${RUNNER_OS}" = "Windows" ]; then
+    workspace="$(cygpath -u "${workspace}")"
   fi
 
-  yq_temp_file_path=".data-format-converter-action-$(date +%s)"
-  echo "yq-temp-file-path=${yq_temp_file_path}" >> "$GITHUB_OUTPUT"
+  bin_path="${workspace}/${bin_dir}"
+  echo "bin-path=${bin_path}" >> "$GITHUB_OUTPUT"
 }
 
 main "$@"

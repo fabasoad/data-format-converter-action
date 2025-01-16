@@ -1,0 +1,69 @@
+---
+name: Test source pattern
+
+on: # yamllint disable-line rule:truthy
+  push:
+    branches:
+      - main
+  pull_request:
+    paths:
+      - .github/workflows/test-source-pattern.yml
+      - src/**
+      - tests/**
+      - action.yml
+  schedule:
+    # Every Friday at 09:00 JST
+    - cron: "0 0 * * 5"
+  workflow_dispatch: {}
+
+defaults:
+  run:
+    shell: sh
+
+jobs:
+  test-source-pattern:
+    name: Convert ("${{ matrix.source-pattern }}", "${{ matrix.from }}")
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - source-pattern: "**/*.lua"
+            from: ""
+            to: "props"
+            expected-files-amount: "1"
+          - source-pattern: "tests/*"
+            from: ""
+            to: "props"
+            expected-files-amount: "6"
+          - source-pattern: "tests/*"
+            from: "xml"
+            to: "props"
+            expected-files-amount: "1"
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v4
+      - name: Convert
+        uses: ./
+        id: convert
+        with:
+          source-pattern: "${{ matrix.source-pattern }}"
+          from: "${{ matrix.from }}"
+          to: "${{ matrix.to }}"
+      - name: List resulting files
+        run: ls -la ${{ steps.convert.outputs.result-path }}
+      - name: Test action completion
+        run: |
+          test_equal() {
+            if [ "${2}" != "${3}" ]; then
+              echo "::error title=${1}::Expected: ${3}. Actual: ${2}."
+              exit 1
+            fi
+          }
+          actual_files_amount=$(find "${{ steps.convert.outputs.result-path }}" \
+            -type f \( -name "*.json" -o -name "*.xml" -o -name "*.yaml" -o -name "*.props" -o -name "*.lua" \) \
+            | wc -l | xargs)
+          test_equal "Amount of files is wrong" \
+            "${actual_files_amount}" \
+            "${{ matrix.expected-files-amount }}"

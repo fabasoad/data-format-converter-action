@@ -38,23 +38,22 @@ jobs:
         uses: ./
         id: convert
         with:
-          input: tests/expected.${{ matrix.from }}
-          from: ${{ matrix.from }}
+          source-pattern: tests/expected-${{ matrix.from }}.${{ matrix.from }}
           to: ${{ matrix.to }}
-      - name: Save result
-        run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
-      - name: Print actual file
-        run: cat actual.${{ matrix.to }}
+      - name: Print converted file
+        run: cat ${{ steps.convert.outputs.result-path }}/expected-${{ matrix.from }}.${{ matrix.to }}
       - name: Validate
         run: |
-          cmp -s "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}" \
-            || diff --strip-trailing-cr "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
-      - name: Clean up
-        if: ${{ always() }}
-        run: rm -f actual.${{ matrix.to }}
+          expected_file_path="tests/expected-${{ matrix.to }}.${{ matrix.to }}"
+          actual_file_path="${{ steps.convert.outputs.result-path }}/expected-${{ matrix.from }}.${{ matrix.to }}"
+          cmp -s "${expected_file_path}" "${actual_file_path}" \
+            || diff --strip-trailing-cr "${expected_file_path}" "${actual_file_path}"
   convert-container:
     name: Convert
+    runs-on: ubuntu-latest
     timeout-minutes: 5
+    container:
+      image: ${{ matrix.image }}:latest
     strategy:
       fail-fast: false
       matrix:
@@ -63,17 +62,14 @@ jobs:
         to: ["yaml", "json", "xml", "props", "lua"]
         include:
           - image: alpine
-            setup-command: ""
+            setup-command: apk add bash
           - image: centos
             setup-command: |
               sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
               sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
               yum update -y
               # cmp
-              yum install -y diffutils
-    runs-on: ubuntu-latest
-    container:
-      image: ${{ matrix.image }}:latest
+              yum install -y diffutils bash
     steps:
       - name: Setup
         if: ${{ matrix.setup-command != '' }}
@@ -84,15 +80,13 @@ jobs:
         uses: ./
         id: convert
         with:
-          input: tests/expected.${{ matrix.from }}
-          from: ${{ matrix.from }}
+          source-pattern: tests/expected-${{ matrix.from }}.${{ matrix.from }}
           to: ${{ matrix.to }}
-      - name: Save result
-        run: echo '${{ steps.convert.outputs.output }}' > actual.${{ matrix.to }}
+      - name: Print converted file
+        run: cat ${{ steps.convert.outputs.result-path }}/expected-${{ matrix.from }}.${{ matrix.to }}
       - name: Validate
         run: |
-          cmp -s "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}" \
-            || diff --strip-trailing-cr "tests/expected.${{ matrix.to }}" "actual.${{ matrix.to }}"
-      - name: Clean up
-        if: ${{ always() }}
-        run: rm -f actual.${{ matrix.to }}
+          expected_file_path="tests/expected-${{ matrix.to }}.${{ matrix.to }}"
+          actual_file_path="${{ steps.convert.outputs.result-path }}/expected-${{ matrix.from }}.${{ matrix.to }}"
+          cmp -s "${expected_file_path}" "${actual_file_path}" \
+            || diff --strip-trailing-cr "${expected_file_path}" "${actual_file_path}"
