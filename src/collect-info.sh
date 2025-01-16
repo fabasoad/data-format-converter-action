@@ -22,7 +22,12 @@ main() {
   bin_dir="yq_$(date +%s)"
   echo "bin-dir=${bin_dir}" >> "$GITHUB_OUTPUT"
 
-  bin_path="$GITHUB_WORKSPACE/${bin_dir}"
+  sep="/"
+  if [ "${RUNNER_OS}" = "Windows" ]; then
+    sep="\"
+  fi
+
+  bin_path="${GITHUB_WORKSPACE}${sep}${bin_dir}"
   echo "bin-path=${bin_path}" >> "$GITHUB_OUTPUT"
 }
 
