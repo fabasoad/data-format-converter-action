@@ -22,6 +22,8 @@ main() {
   bin_dir="yq_$(date +%s)"
   echo "bin-dir=${bin_dir}" >> "$GITHUB_OUTPUT"
 
+  # Convert Windows-style path into Unix-style path:
+  # D:\data\test.xml > /d/data/test.xml
   workspace="${GITHUB_WORKSPACE}"
   if [ "${RUNNER_OS}" = "Windows" ]; then
     workspace="$(cygpath -u "${workspace}")"

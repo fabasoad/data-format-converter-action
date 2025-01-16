@@ -17,6 +17,8 @@ main() {
   source_files=($input_source_path)
 
   result_path="${RUNNER_TEMP}/data-format-converter-action-$(date +%s)"
+  # Convert Windows-style path into Unix-style path:
+  # D:\data\test.xml > /d/data/test.xml
   if [ "${RUNNER_OS}" = "Windows" ]; then
     result_path="$(cygpath -u "${result_path}")"
   fi

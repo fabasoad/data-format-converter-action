@@ -32,7 +32,7 @@ The following tools have to be installed for successful work of this GitHub Acti
 - uses: fabasoad/data-format-converter-action@v1
   with:
     # (Required) Pattern in glob format that would be used to list the files.
-    source-pattern: "report.xml"
+    source-pattern: "configs/**"
     # (Optional) Data type of the source files. Possible values: json, xml, yaml,
     # props, lua. Defaults to the type defined by file extension.
     from: "xml"
