@@ -9,6 +9,7 @@ LIB_DIR_PATH="${SRC_DIR_PATH}/lib"
 main() {
   input_from="${1}"
   input_to="${2}"
+  workspace="${3}"
 
   if command -v yq >/dev/null 2>&1; then
     yq_installed="true"
@@ -22,12 +23,7 @@ main() {
   bin_dir="yq_$(date +%s)"
   echo "bin-dir=${bin_dir}" >> "$GITHUB_OUTPUT"
 
-  sep="/"
-  if [ "${RUNNER_OS}" = "Windows" ]; then
-    sep="\\"
-  fi
-
-  bin_path="${GITHUB_WORKSPACE}${sep}${bin_dir}"
+  bin_path="${workspace}/${bin_dir}"
   echo "bin-path=${bin_path}" >> "$GITHUB_OUTPUT"
 }
 

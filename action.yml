@@ -55,7 +55,7 @@ runs:
       env:
         INPUT_FROM: "${{ inputs.from }}"
         INPUT_TO: "${{ inputs.to }}"
-      run: ./collect-info.sh "${INPUT_FROM}" "${INPUT_TO}"
+      run: ./collect-info.sh "${INPUT_FROM}" "${INPUT_TO}" "${{ github.workspace }}"
       shell: sh
       working-directory: ${{ github.action_path }}/src
 
@@ -84,7 +84,7 @@ runs:
         if [ "${{ steps.info.outputs.yq-installed }}" = "true" ]; then
           yq_path="$(which yq)"
         else
-          yq_path="${{ steps.info.outputs.bin-path }}${{ runner.os == 'Windows' && '\' || '/' }}${{ steps.define-binary.outputs.name }}"
+          yq_path="${{ steps.info.outputs.bin-path }}/${{ steps.define-binary.outputs.name }}"
           if [ "$RUNNER_OS" != "Windows" ]; then
             chmod +x "${yq_path}"
           fi
