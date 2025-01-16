@@ -55,7 +55,7 @@ runs:
       env:
         INPUT_FROM: "${{ inputs.from }}"
         INPUT_TO: "${{ inputs.to }}"
-      run: ./collect-info.sh "${INPUT_FROM}" "${INPUT_TO}" "${{ github.workspace }}"
+      run: ./collect-info.sh "${INPUT_FROM}" "${INPUT_TO}"
       shell: sh
       working-directory: ${{ github.action_path }}/src
 
