@@ -54,23 +54,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     container:
-      image: ${{ matrix.image }}:latest
+      image: ${{ matrix.image }}
     strategy:
       fail-fast: false
       matrix:
-        image: ["alpine", "centos"]
+        image: ["alpine:3.21", "rockylinux:9.3-minimal"]
         from: ["yaml", "json", "xml", "props", "lua"]
         to: ["yaml", "json", "xml", "props", "lua"]
         include:
           - image: alpine
             setup-command: apk add bash
-          - image: centos
-            setup-command: |
-              sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
-              sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
-              yum update -y
-              # cmp
-              yum install -y diffutils bash
     steps:
       - name: Setup
         if: ${{ matrix.setup-command != '' }}
