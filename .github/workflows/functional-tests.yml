@@ -65,7 +65,7 @@ jobs:
           - image: alpine:3.21
             setup-command: apk add bash
           - image: rockylinux:9.3
-            setup-command: dnf install -y tar
+            setup-command: dnf install -y tar diffutils
     steps:
       - name: Setup
         if: ${{ matrix.setup-command != '' }}
