@@ -14,7 +14,7 @@ repos:
         args: []
         exclude: "^(tests\/.*)$"
         # https://github.com/prettier/prettier/releases
-        additional_dependencies: ["prettier@3.4.2"]
+        additional_dependencies: ["prettier@3.5.3"]
         stages: ["pre-commit"]
   # Security
   - repo: https://github.com/Yelp/detect-secrets
@@ -48,7 +48,7 @@ repos:
         stages: ["pre-commit"]
   # Yaml
   - repo: https://github.com/adrienverge/yamllint
-    rev: v1.36.2
+    rev: v1.37.0
     hooks:
       - id: yamllint
         stages: ["pre-push"]
