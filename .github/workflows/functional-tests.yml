@@ -34,7 +34,7 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Convert
         uses: ./
         id: convert
@@ -71,7 +71,7 @@ jobs:
         if: ${{ matrix.setup-command != '' }}
         run: ${{ matrix.setup-command }}
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Convert
         uses: ./
         id: convert
