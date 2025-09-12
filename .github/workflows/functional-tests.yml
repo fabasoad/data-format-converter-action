@@ -58,11 +58,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: ["alpine:3.21", "rockylinux:9.3"]
+        image: ["alpine:3.22", "rockylinux:9.3"]
         from: ["yaml", "json", "xml", "props", "lua"]
         to: ["yaml", "json", "xml", "props", "lua"]
         include:
-          - image: alpine:3.21
+          - image: alpine:3.22
             setup-command: apk add bash
           - image: rockylinux:9.3
             setup-command: dnf install -y tar diffutils
