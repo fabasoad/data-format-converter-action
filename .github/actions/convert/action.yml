@@ -1,0 +1,33 @@
+---
+name: Converts, prints, validates
+author: Yevhen Fabizhevskyi
+description: It is used for tests only.
+branding:
+  icon: copy
+  color: green
+inputs:
+  from:
+    description: formats to convert from
+    required: true
+  to:
+    description: formats to convert to
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Convert ${{ inputs.from }} to ${{ inputs.to }}
+      uses: ./
+      id: convert
+      with:
+        source-pattern: tests/expected-${{ inputs.from }}.${{ inputs.from }}
+        to: ${{ inputs.to }}
+    - name: Print resulting ${{ inputs.to }} file
+      run: cat ${{ steps.convert.outputs.result-path }}/expected-${{ inputs.from }}.${{ inputs.to }}
+      shell: sh
+    - name: Validate resulting ${{ inputs.to }} file
+      run: |
+        expected_file_path="tests/expected-${{ inputs.to }}.${{ inputs.to }}"
+        actual_file_path="${{ steps.convert.outputs.result-path }}/expected-${{ inputs.from }}.${{ inputs.to }}"
+        cmp -s "${expected_file_path}" "${actual_file_path}" \
+          || diff --strip-trailing-cr "${expected_file_path}" "${actual_file_path}"
+      shell: sh
