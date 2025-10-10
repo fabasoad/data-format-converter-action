@@ -158,7 +158,7 @@ jobs:
           from: "lua"
           to: "lua"
   convert-container:
-    name: Convert (${{ matrix.image }})
+    name: Convert (${{ matrix.name }})
     runs-on: ubuntu-latest
     timeout-minutes: 5
     container:
@@ -170,7 +170,7 @@ jobs:
           - name: alpine
             image: alpine:3.22
             setup-command: apk add bash
-          - name: rocky
+          - name: rockylinux
             image: rockylinux/rockylinux:10
             setup-command: dnf install -y tar diffutils
     steps:
