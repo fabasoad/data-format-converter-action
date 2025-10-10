@@ -22,33 +22,141 @@ defaults:
 
 jobs:
   convert:
-    name: Convert
+    name: Convert (${{ matrix.os }})
     timeout-minutes: 5
     strategy:
       fail-fast: false
-      max-parallel: ${{ github.event_name == 'pull_request' && 32 || 1 }}
       matrix:
         os: ["ubuntu", "windows", "macos"]
-        from: ["yaml", "json", "xml", "props", "lua"]
-        to: ["yaml", "json", "xml", "props", "lua"]
     runs-on: ${{ matrix.os }}-latest
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v5
-      - name: Convert
-        uses: ./
-        id: convert
+      - name: yaml to yaml
+        uses: ./.github/actions/convert
         with:
-          source-pattern: tests/expected-${{ matrix.from }}.${{ matrix.from }}
-          to: ${{ matrix.to }}
-      - name: Print converted file
-        run: cat ${{ steps.convert.outputs.result-path }}/expected-${{ matrix.from }}.${{ matrix.to }}
-      - name: Validate
-        run: |
-          expected_file_path="tests/expected-${{ matrix.to }}.${{ matrix.to }}"
-          actual_file_path="${{ steps.convert.outputs.result-path }}/expected-${{ matrix.from }}.${{ matrix.to }}"
-          cmp -s "${expected_file_path}" "${actual_file_path}" \
-            || diff --strip-trailing-cr "${expected_file_path}" "${actual_file_path}"
+          from: "yaml"
+          to: "yaml"
+      - name: yaml to json
+        uses: ./.github/actions/convert
+        with:
+          from: "yaml"
+          to: "json"
+      - name: yaml to xml
+        uses: ./.github/actions/convert
+        with:
+          from: "yaml"
+          to: "xml"
+      - name: yaml to props
+        uses: ./.github/actions/convert
+        with:
+          from: "yaml"
+          to: "props"
+      - name: yaml to lua
+        uses: ./.github/actions/convert
+        with:
+          from: "yaml"
+          to: "lua"
+      - name: json to yaml
+        uses: ./.github/actions/convert
+        with:
+          from: "json"
+          to: "yaml"
+      - name: json to json
+        uses: ./.github/actions/convert
+        with:
+          from: "json"
+          to: "json"
+      - name: json to xml
+        uses: ./.github/actions/convert
+        with:
+          from: "json"
+          to: "xml"
+      - name: json to props
+        uses: ./.github/actions/convert
+        with:
+          from: "json"
+          to: "props"
+      - name: json to lua
+        uses: ./.github/actions/convert
+        with:
+          from: "json"
+          to: "lua"
+      - name: xml to yaml
+        uses: ./.github/actions/convert
+        with:
+          from: "xml"
+          to: "yaml"
+      - name: xml to json
+        uses: ./.github/actions/convert
+        with:
+          from: "xml"
+          to: "json"
+      - name: xml to xml
+        uses: ./.github/actions/convert
+        with:
+          from: "xml"
+          to: "xml"
+      - name: xml to props
+        uses: ./.github/actions/convert
+        with:
+          from: "xml"
+          to: "props"
+      - name: xml to lua
+        uses: ./.github/actions/convert
+        with:
+          from: "xml"
+          to: "lua"
+      - name: props to yaml
+        uses: ./.github/actions/convert
+        with:
+          from: "props"
+          to: "yaml"
+      - name: props to json
+        uses: ./.github/actions/convert
+        with:
+          from: "props"
+          to: "json"
+      - name: props to xml
+        uses: ./.github/actions/convert
+        with:
+          from: "props"
+          to: "xml"
+      - name: props to props
+        uses: ./.github/actions/convert
+        with:
+          from: "props"
+          to: "props"
+      - name: props to lua
+        uses: ./.github/actions/convert
+        with:
+          from: "props"
+          to: "lua"
+      - name: lua to yaml
+        uses: ./.github/actions/convert
+        with:
+          from: "lua"
+          to: "yaml"
+      - name: lua to json
+        uses: ./.github/actions/convert
+        with:
+          from: "lua"
+          to: "json"
+      - name: lua to xml
+        uses: ./.github/actions/convert
+        with:
+          from: "lua"
+          to: "xml"
+      - name: lua to props
+        uses: ./.github/actions/convert
+        with:
+          from: "lua"
+          to: "props"
+      - name: lua to lua
+        uses: ./.github/actions/convert
+        with:
+          from: "lua"
+          to: "lua"
   convert-container:
     name: Convert (${{ matrix.image }})
     runs-on: ubuntu-latest
@@ -59,9 +167,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - image: alpine:3.22
+          - name: alpine
+            image: alpine:3.22
             setup-command: apk add bash
-          - image: rockylinux:10
+          - name: rocky
+            image: rockylinux/rockylinux:10
             setup-command: dnf install -y tar diffutils
     steps:
       - name: Setup
