@@ -31,7 +31,7 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: yaml to yaml
         uses: ./.github/actions/convert
         with:
@@ -178,7 +178,7 @@ jobs:
         if: ${{ matrix.setup-command != '' }}
         run: ${{ matrix.setup-command }}
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: yaml to yaml
         uses: ./.github/actions/convert
         with:

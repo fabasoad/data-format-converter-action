@@ -43,7 +43,7 @@ jobs:
             expected-files-amount: "1"
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Convert
         uses: ./
         id: convert
