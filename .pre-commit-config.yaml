@@ -14,7 +14,7 @@ repos:
         args: []
         exclude: "^(tests\/.*)$"
         # https://github.com/prettier/prettier/releases
-        additional_dependencies: ["prettier@3.6.2"]
+        additional_dependencies: ["prettier@3.7.4"]
         stages: ["pre-commit"]
   # Security
   - repo: https://github.com/Yelp/detect-secrets
