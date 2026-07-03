@@ -25,6 +25,8 @@ jobs:
     name: Convert ("${{ matrix.source-pattern }}", "${{ matrix.from }}")
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -43,7 +45,9 @@ jobs:
             expected-files-amount: "1"
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: "false"
       - name: Convert
         uses: ./
         id: convert
@@ -52,8 +56,12 @@ jobs:
           from: "${{ matrix.from }}"
           to: "${{ matrix.to }}"
       - name: List resulting files
-        run: ls -la ${{ steps.convert.outputs.result-path }}
+        env:
+          STEP_CONVERT_OUTPUT_RESULT_PATH: "${{ steps.convert.outputs.result-path }}"
+        run: ls -la ${STEP_CONVERT_OUTPUT_RESULT_PATH}
       - name: Test action completion
+        env:
+          CONVERT_OUTPUT_RESULT_PATH: "${{ steps.convert.outputs.result-path }}"
         run: |
           test_equal() {
             if [ "${2}" != "${3}" ]; then
@@ -61,7 +69,7 @@ jobs:
               exit 1
             fi
           }
-          actual_files_amount=$(find "${{ steps.convert.outputs.result-path }}" \
+          actual_files_amount=$(find "${CONVERT_OUTPUT_RESULT_PATH}" \
             -type f \( -name "*.json" -o -name "*.xml" -o -name "*.yaml" -o -name "*.props" -o -name "*.lua" \) \
             | wc -l | xargs)
           test_equal "Amount of files is wrong" \

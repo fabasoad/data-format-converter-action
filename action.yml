@@ -69,7 +69,7 @@ runs:
     - name: Download mikefarah/yq
       if: ${{ inputs.from != inputs.to && steps.info.outputs.yq-installed == 'false' }}
       id: download-binary
-      uses: robinraju/release-downloader@v1
+      uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
       with:
         repository: "mikefarah/yq"
         latest: "true"
@@ -80,11 +80,15 @@ runs:
     - name: Install mikefarah/yq
       if: ${{ inputs.from != inputs.to }}
       id: install-yq
+      env:
+        STEP_INFO_OUTPUT_YQ_INSTALLED: "${{ steps.info.outputs.yq-installed }}"
+        STEP_INFO_OUTPUT_BIN_PATH: "${{ steps.info.outputs.bin-path }}"
+        STEP_DEFINE_BINARY_OUTPUT_NAME: "${{ steps.define-binary.outputs.name }}"
       run: |
-        if [ "${{ steps.info.outputs.yq-installed }}" = "true" ]; then
+        if [ "${STEP_INFO_OUTPUT_YQ_INSTALLED}" = "true" ]; then
           yq_path="$(which yq)"
         else
-          yq_path="${{ steps.info.outputs.bin-path }}/${{ steps.define-binary.outputs.name }}"
+          yq_path="${STEP_INFO_OUTPUT_BIN_PATH}/${STEP_DEFINE_BINARY_OUTPUT_NAME}"
           if [ "$RUNNER_OS" != "Windows" ]; then
             chmod +x "${yq_path}"
           fi
@@ -94,7 +98,9 @@ runs:
 
     - name: Print yq version
       if: ${{ inputs.from != inputs.to }}
-      run: ${{ steps.install-yq.outputs.yq-path }} --version
+      env:
+        STEP_INSTALL_YQ_OUTPUT_YQ_PATH: "${{ steps.install-yq.outputs.yq-path }}"
+      run: ${STEP_INSTALL_YQ_OUTPUT_YQ_PATH} --version
       shell: sh
 
     - name: Convert
@@ -103,9 +109,10 @@ runs:
         INPUT_FROM: "${{ inputs.from }}"
         INPUT_TO: "${{ inputs.to }}"
         INPUT_SOURCE_PATTERN: "${{ inputs.source-pattern }}"
+        STEP_INSTALL_YQ_OUTPUT_YQ_PATH: "${{ steps.install-yq.outputs.yq-path }}"
       run: |
         ${GITHUB_ACTION_PATH}/src/convert.sh \
-          "${{ steps.install-yq.outputs.yq-path }}" \
+          "${STEP_INSTALL_YQ_OUTPUT_YQ_PATH}" \
           "${INPUT_FROM:-all}" \
           "${INPUT_TO}" \
           "${INPUT_SOURCE_PATTERN}"
