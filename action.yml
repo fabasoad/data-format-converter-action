@@ -89,7 +89,7 @@ runs:
           yq_path="$(which yq)"
         else
           yq_path="${STEP_INFO_OUTPUT_BIN_PATH}/${STEP_DEFINE_BINARY_OUTPUT_NAME}"
-          if [ "$RUNNER_OS" != "Windows" ]; then
+          if [ "${RUNNER_OS}" != "Windows" ]; then
             chmod +x "${yq_path}"
           fi
         fi
