@@ -23,15 +23,19 @@ defaults:
 jobs:
   convert:
     name: Convert (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
         os: ["ubuntu", "windows", "macos"]
-    runs-on: ${{ matrix.os }}-latest
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: "false"
       - name: yaml to yaml
         uses: ./.github/actions/convert
         with:
@@ -161,6 +165,8 @@ jobs:
     name: Convert (${{ matrix.name }})
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
     container:
       image: ${{ matrix.image }}
     strategy:
@@ -178,7 +184,9 @@ jobs:
         if: ${{ matrix.setup-command != '' }}
         run: ${{ matrix.setup-command }}
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: "false"
       - name: yaml to yaml
         uses: ./.github/actions/convert
         with:

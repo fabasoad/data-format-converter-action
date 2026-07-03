@@ -14,7 +14,7 @@ repos:
         args: []
         exclude: "^(tests\/.*)$"
         # https://github.com/prettier/prettier/releases
-        additional_dependencies: ["prettier@3.7.4"]
+        additional_dependencies: ["prettier@3.9.4"]
         stages: ["pre-commit"]
   # Security
   - repo: https://github.com/Yelp/detect-secrets
@@ -22,7 +22,7 @@ repos:
     hooks:
       - id: detect-secrets
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.30.0
+    rev: v8.30.1
     hooks:
       - id: gitleaks
   - repo: https://github.com/fabasoad/pre-commit-grype
